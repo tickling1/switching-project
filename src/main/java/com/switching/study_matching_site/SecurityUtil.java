@@ -30,7 +30,6 @@ public class SecurityUtil {
     public Long getMemberIdByUserDetails() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-
         Long memberId = 0L;
 
         /**

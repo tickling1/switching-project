@@ -61,11 +61,14 @@ public class NoticeService {
     }
 
     // 공지사항 변경 - 방 ID, 공지사항 ID
-    public void updateNotice(NoticeUpdate noticeUpdateDto, Long roomId, Long noticeId, Long memberId) {
+    public void updateNotice(NoticeUpdate noticeUpdateDto, Long roomId, Long noticeId) {
         Optional<Notice> findNotice = noticeRepository.findById(noticeId);
+        Long tryMemberId = securityUtil.getMemberIdByUserDetails();
+
         // 멤버 룰 찾기 위해
-        Optional<Participation> findRule = participationRepository.findByRoomAndMember(roomId, memberId);
+        Optional<Participation> findRule = participationRepository.findByRoomAndMember(roomId, tryMemberId);
         if (findRule.get().getRoleType() == RoleType.ADMIN) {
+
             if (findNotice.isPresent()) {
                 Notice notice = findNotice.get();
                 if (notice.getNoticeTitle() != null) notice.setNoticeTitle(noticeUpdateDto.getTitle());

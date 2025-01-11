@@ -1,5 +1,6 @@
 package com.switching.study_matching_site.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,12 +13,14 @@ public class FriendRequest {
     @Id @GeneratedValue
     private Long id;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SENDER_ID")
     private Member sender;
 
     private String sendMemberId;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "RECEIVER_ID")
     private Member receiver;
