@@ -1,6 +1,7 @@
 package com.switching.study_matching_site.dto.notice;
 
 import com.switching.study_matching_site.domain.Notice;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,9 +9,13 @@ import lombok.Setter;
 @Builder
 @Setter
 @Getter
+@Schema(name = "공지사항 보기 응답 DTO")
 public class NoticeRead {
 
+    @Schema(description = "공지사항 제목")
     private String title;
+    
+    @Schema(description = "공지사항 내용")
     private String content;
 
     /**

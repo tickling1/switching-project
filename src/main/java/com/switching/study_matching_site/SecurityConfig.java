@@ -79,9 +79,10 @@ public class SecurityConfig {
         //경로별 인가 작업
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/studywithmatching.com/members/login",
-                                "/", "/studywithmatching.com/members",
+                        .requestMatchers(
                                 "/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**",
+                                "/studywithmatching.com/members/login",
+                                "/", "/studywithmatching.com/members",
                                 "/studywithmatching.com/members/reissue").permitAll()// 해당 경로에서는 모든 권한를 허용함
                         .anyRequest().authenticated()); // 나머지 요청에서는 로그인한 사람만 들어갈 수 있음.
 
