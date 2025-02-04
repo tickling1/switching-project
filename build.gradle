@@ -54,11 +54,8 @@ dependencies {
 	// Swagger
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
 
-	// 암호화를 위한 라이브러리
-	implementation group: 'com.google.guava', name: 'guava', version: '32.1.2-jre'
-
-	// 랜덤 비밀번호 생성
-	implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
+	// jasypt 암호화
+	implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.5'
 
 	// 스프링 시큐리티
 	implementation 'org.springframework.boot:spring-boot-starter-security'

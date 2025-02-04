@@ -1,4 +1,4 @@
-package com.switching.study_matching_site;
+package com.switching.study_matching_site.config;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;

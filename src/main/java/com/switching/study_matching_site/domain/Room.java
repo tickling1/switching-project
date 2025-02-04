@@ -12,7 +12,7 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-public class Room {
+public class Room extends BaseTimeEntity{
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ROOM_ID")
@@ -68,9 +68,6 @@ public class Room {
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Chat> chat_history = new ArrayList<>();
 
-    public Room() {
-    }
-
     public Room(String roomTitle,
                 RoomStatus roomStatus,
                 Integer currentCount,
@@ -93,5 +90,9 @@ public class Room {
         this.projectLevel = projectLevel;
         this.projectRegion = projectRegion;
         this.offlineStatus = offlineStatus;
+    }
+
+    public Room() {
+
     }
 }

@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "PROFILE", description = "프로필 API")
 @RestController
-@RequestMapping("/studywithmatching.com")
 @RequiredArgsConstructor
 public class ProfileController {
 

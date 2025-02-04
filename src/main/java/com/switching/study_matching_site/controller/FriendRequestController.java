@@ -19,7 +19,6 @@ import java.util.List;
 
 @Tag(name = "FRIEND-REQUEST", description = "친구 요청 API")
 @RestController
-@RequestMapping("/studywithmatching.com")
 @AllArgsConstructor
 public class FriendRequestController {
 

@@ -20,6 +20,7 @@ import java.time.LocalTime;
 @Schema(name = "프로필 생성 요청 DTO")
 public class ProfileCreateDto {
 
+
     //@NotNull
     @Schema(description = "오프라인 여부", example = "OFFLINE, ONLINEb")
     private Boolean isOffline; // true면 오프라인, false면 온라인

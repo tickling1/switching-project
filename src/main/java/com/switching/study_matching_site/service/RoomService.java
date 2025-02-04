@@ -1,17 +1,17 @@
 package com.switching.study_matching_site.service;
 
-import com.switching.study_matching_site.domain.Room;
-import com.switching.study_matching_site.domain.RoomStatus;
-import com.switching.study_matching_site.dto.room.RoomCreate;
-import com.switching.study_matching_site.dto.room.RoomDetail;
-import com.switching.study_matching_site.dto.room.RoomInfo;
-import com.switching.study_matching_site.dto.room.RoomUpdate;
+import com.switching.study_matching_site.domain.*;
+import com.switching.study_matching_site.dto.room.*;
 import com.switching.study_matching_site.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -60,15 +60,19 @@ public class RoomService {
 
     // 스터디 방 전체 목록
     @Transactional(readOnly = true)
-    public List<RoomInfo> roomInfoList() {
-        List<Room> roomList = roomRepository.findAll();
-        List<RoomInfo> roomInfoList = new ArrayList<>();
+    public PageResponseDto<RoomInfoResponseDto> roomInfoList() {
+        PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "startTime"));
+        Page<Room> roomPage = roomRepository.findAll(pageRequest);
 
-        for (Room room : roomList) {
-            roomInfoList.add(RoomInfo.fromEntity(room));
-        }
-        return roomInfoList;
+        // Room -> RoomInfoResponseDto 변환
+        List<RoomInfoResponseDto> content = roomPage.getContent().stream()
+                .map(RoomInfoResponseDto::fromEntity)
+                .toList();
+
+        // PageResponseDto 생성
+        return new PageResponseDto<>(content, roomPage.getTotalElements(), roomPage.getTotalPages());
     }
+
 
     // 스터디 방 삭제
     public void removeRoom(Long roomId) {
@@ -80,6 +84,15 @@ public class RoomService {
             } else {
                 throw new IllegalStateException("아직 방 인원이 남아있습니다.");
             }
+        }
+    }
+
+    public void initData() {
+
+        for (int i = 0; i < 25; i++) {
+            Room room = new Room("테스트 방" + i, RoomStatus.ON, 3, 10,
+                    LocalTime.now(), LocalTime.now(), Goal.STUDY, TechSkill.JAVA, 3, Region.SEOUL, OfflineStatus.OFFLINE);
+            roomRepository.save(room);
         }
     }
 }

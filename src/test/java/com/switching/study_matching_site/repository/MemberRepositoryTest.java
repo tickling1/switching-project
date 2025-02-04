@@ -2,7 +2,6 @@ package com.switching.study_matching_site.repository;
 
 import com.switching.study_matching_site.StudyMatchingSiteApplication;
 import com.switching.study_matching_site.domain.Member;
-import com.switching.study_matching_site.encrypt.Encoder;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -104,7 +103,6 @@ public class MemberRepositoryTest {
         Member member = new Member();
         member.setUsername("memberA");
         member.setLoginId("kqk1ds");
-        member.setPassword(Encoder.hashingAndSalting("1234"));
         member.setBirthDate(LocalDate.now());
         memberRepository.save(member);
 
