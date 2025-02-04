@@ -1,8 +1,8 @@
 package com.switching.study_matching_site.controller;
 
-import com.switching.study_matching_site.dto.notice.NoticeRead;
+import com.switching.study_matching_site.dto.room.PageResponseDto;
 import com.switching.study_matching_site.dto.room.RoomDetail;
-import com.switching.study_matching_site.dto.room.RoomInfo;
+import com.switching.study_matching_site.dto.room.RoomInfoResponseDto;
 import com.switching.study_matching_site.dto.room.RoomUpdate;
 import com.switching.study_matching_site.service.RoomService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,13 +12,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @Tag(name = "ROOM", description = "방 API")
 @RestController
-@RequestMapping("/studywithmatching.com")
 @RequiredArgsConstructor
 public class RoomController {
 
@@ -36,6 +36,7 @@ public class RoomController {
                 )
         )
     })
+
     @GetMapping("/rooms/{roomId}")
     public String findRoomDetail(@Parameter(description = "방 ID")
                                      @PathVariable(name = "roomId") Long roomId) {
@@ -51,14 +52,14 @@ public class RoomController {
                             description = "방 목록 조회 성공",
                             content = @Content(
                                     mediaType = "application/json",
-                                    schema = @Schema(implementation = RoomInfo.class)
+                                    schema = @Schema(implementation = RoomInfoResponseDto.class)
                             )
                     )
             })
     @GetMapping("/rooms")
-    public String roomList() {
-        List<RoomInfo> roomInfos = roomService.roomInfoList();
-        return roomInfos.toString();
+    public PageResponseDto<RoomInfoResponseDto> roomList() {
+        roomService.roomInfoList();
+        return roomService.roomInfoList();
     }
 
     // 방 수정 - 권한자가 수정 가능

@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/studywithmatching.com")
 @RequiredArgsConstructor
 @Tag(name = "CHAT", description = "채팅 API")
 public class ChatController {

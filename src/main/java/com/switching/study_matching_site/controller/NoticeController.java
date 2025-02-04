@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "NOTICE", description = "공지사항 API")
 @RestController
-@RequestMapping("/studywithmatching.com")
 @RequiredArgsConstructor
 public class NoticeController {
 

@@ -1,0 +1,35 @@
+# applicaton-dev.yml
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+  datasource:
+    url: ENC(IxWZd7iLU/V9qi8AT63ALcmAhRWD3TKqOQQPv0wNRtltexkp0AWaRCyvZ1CwG9tWck0qdRO1WRs=)
+    username: ENC(02RRfWWBpyqVy0Sp725Oyg==)
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        # show_sql: true
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+
+# ${환경변수} 로 숨기기
+jasypt:
+  encryptor:
+    password: encryptTestKey
+
+logging.level:
+  org.hibernate.SQL: debug
+  # org.hibernate.type: trace
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui
+  api-docs:
+    path: /v3/api-docs
