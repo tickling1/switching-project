@@ -1,13 +1,11 @@
-package com.switching.study_matching_site;
+package com.switching.study_matching_site.config;
 
-import com.switching.study_matching_site.dto.member.CustomUserDetails;
 import com.switching.study_matching_site.jwt.CustomLogoutFilter;
 import com.switching.study_matching_site.jwt.LoginFilter;
 import com.switching.study_matching_site.jwt.JWTFilter;
 import com.switching.study_matching_site.jwt.JWTUtil;
 import com.switching.study_matching_site.repository.RefreshRepository;
 import com.switching.study_matching_site.service.CustomerUserDetailsService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -81,9 +79,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers(
                                 "/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**",
-                                "/studywithmatching.com/members/login",
-                                "/", "/studywithmatching.com/members",
-                                "/studywithmatching.com/members/reissue").permitAll()// 해당 경로에서는 모든 권한를 허용함
+                                "/members/login",
+                                "/", "/members",
+                                "/members/reissue").permitAll()// 해당 경로에서는 모든 권한를 허용함
                         .anyRequest().authenticated()); // 나머지 요청에서는 로그인한 사람만 들어갈 수 있음.
 
 

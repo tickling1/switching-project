@@ -14,14 +14,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "LOGIN", description = "로그인 API")
 @RestController
-@RequestMapping("/studywithmatching.com/members")
 @RequiredArgsConstructor
 public class LoginController {
 
     private final LoginService loginService;
 
     @Operation(summary = "리프레쉬 토큰을 생성합니다.", description = "만료된 리프레쉬 토큰을 재성성 합니다.")
-    @PostMapping("/reissue")
+    @PostMapping("/members/reissue")
     public ResponseEntity<?> reissue(HttpServletRequest request, HttpServletResponse response) {
 
          return loginService.getRefreshToken(request, response);

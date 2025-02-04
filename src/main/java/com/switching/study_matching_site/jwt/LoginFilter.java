@@ -42,7 +42,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         setPasswordParameter("password");  // password는 그대로 사용
 
         // 기본값: /login
-        setFilterProcessesUrl("/studywithmatching.com/members/login");
+        setFilterProcessesUrl("/members/login");
     }
 
     @Override

@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "PARTICIPATION", description = "방 참여 API")
 @RestController
-@RequestMapping("/studywithmatching.com/members")
+@RequestMapping("/members")
 @RequiredArgsConstructor
 public class ParticipationController {
 
