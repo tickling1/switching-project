@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "PARTICIPATION", description = "방 참여 API")
 @RestController
+@RequestMapping("/members")
 @RequiredArgsConstructor
 public class ParticipationController {
 
@@ -23,32 +24,46 @@ public class ParticipationController {
 
     // 멤버가 방 생성
     @Operation(summary = "방 생성", description = "회원이 방을 생성합니다.")
-    @PostMapping("/rooms")
-    public Long memberCreateRoom(@RequestBody RoomCreate roomCreateDto) {
-        return participationService.newParticipation(roomCreateDto);
+    @PostMapping("/{memberId}/rooms")
+    public Long memberCreateRoom(@Parameter(name = "memberId", description = "members의 id", in = ParameterIn.PATH)
+                                     @PathVariable(name = "memberId")Long memberId,
+                                 @RequestBody RoomCreate roomCreateDto) {
+        return participationService.newParticipation(memberId, roomCreateDto);
     }
 
     // 멤버가 방 참여
     @Operation(summary = "방 참여", description = "회원이 방에 참여합니다.")
-    @Parameter(name = "roomId", description = "방 ID", in = ParameterIn.PATH)
-    @PostMapping("/rooms/{roomId}/join")
-    public Long memberJoinRoom(@PathVariable(name = "roomId")Long roomId) {
-        return participationService.participate(roomId);
+    @Parameters({
+            @Parameter(name = "memberId", description = "members의 id", in = ParameterIn.PATH),
+            @Parameter(name = "roomId", description = "방 ID", in = ParameterIn.PATH)
+    })
+    @PostMapping("/{memberId}/rooms/{roomId}/join")
+    public Long memberJoinRoom(@PathVariable(name = "memberId")Long memberId,
+                               @PathVariable(name = "roomId")Long roomId) {
+        return participationService.participate(memberId, roomId);
     }
 
     @Operation(summary = "UUID로 방 참여", description = "UUID로 회원이 방에 참여합니다.")
-    @Parameter(name = "roomUUID", description = "방 UUID", in = ParameterIn.PATH)
-    @PostMapping("/rooms/uuid/{roomUUID}/join")
-    public Long memberJoinRoomWithUUID(@PathVariable(name = "roomUUID") String roomUUID) {
-        return participationService.participateWithUUID(roomUUID);
+    @Parameters({
+            @Parameter(name = "memberId", description = "members의 id", in = ParameterIn.PATH),
+            @Parameter(name = "roomUUID", description = "방 UUID", in = ParameterIn.PATH)
+    })
+    @PostMapping("/{memberId}/rooms/uuid/{roomUUID}/join")
+    public Long memberJoinRoomWithUUID(@PathVariable(name = "memberId") Long memberId,
+                                       @PathVariable(name = "roomUUID") String roomUUID) {
+        return participationService.participateWithUUID(memberId, roomUUID);
     }
 
     // 문제 - 확인해보기
     @Operation(summary = "방 나가기", description = "회원이 방을 나갑니다.")
-    @Parameter(name = "roomId", description = "방 ID", in = ParameterIn.PATH)
-    @PostMapping("/rooms/{roomId}/leave")
-    public String memberExitRoom(@PathVariable(name = "roomId")Long roomId) {
-        participationService.leave(roomId);
+    @Parameters({
+            @Parameter(name = "memberId", description = "members의 id", in = ParameterIn.PATH),
+            @Parameter(name = "roomId", description = "방 ID", in = ParameterIn.PATH)
+    })
+    @PostMapping("/{memberId}/rooms/{roomId}/leave")
+    public String memberExitRoom(@PathVariable(name = "memberId") Long memberId,
+                                 @PathVariable(name = "roomId")Long roomId) {
+        participationService.leave(memberId, roomId);
         return "회원이 방을 나갔습니다.";
     }
 }

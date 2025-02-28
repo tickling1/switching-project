@@ -2,8 +2,8 @@ package com.switching.study_matching_site.service;
 
 import com.switching.study_matching_site.domain.*;
 import com.switching.study_matching_site.dto.room.*;
-import com.switching.study_matching_site.exception.EntityNotFoundException;
 import com.switching.study_matching_site.exception.ErrorCode;
+import com.switching.study_matching_site.exception.InvalidValueException;
 import com.switching.study_matching_site.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -39,9 +39,8 @@ public class RoomService {
         Optional<Room> findRoom = roomRepository.findById(roomId);
         if (findRoom.isPresent()) {
             return RoomDetail.fromEntity(findRoom.get());
-        } else {
-            throw new EntityNotFoundException(ErrorCode.ROOM_NOT_FOUND);
         }
+        return null;
     }
 
     // 스터디 방 수정
@@ -85,7 +84,7 @@ public class RoomService {
             if (findRoom.get().getCurrentCount() == 1) {
                 roomRepository.deleteById(roomId);
             } else {
-                throw new IllegalStateException("아직 방 인원이 남아있습니다.");
+                throw new InvalidValueException(ErrorCode.ROOM_FAILED_REMOVE);
             }
         }
     }

@@ -9,6 +9,4 @@ public interface ProfileRepository extends JpaRepository<Profile, Long> {
 
     @Query("select p from Profile p where p.id = :profileId and p.member.id = :memberId")
     Profile findProfileById(@Param("profileId") Long profileId, @Param("memberId") Long memberId);
-
-    Boolean existsByIdAndMemberId(Long id, Long memberId);
 }

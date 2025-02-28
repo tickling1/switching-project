@@ -1,7 +1,7 @@
 package com.switching.study_matching_site.config;
 
-import com.switching.study_matching_site.exception.CustomAuthenticationFailureHandler;
 import com.switching.study_matching_site.jwt.CustomLogoutFilter;
+import com.switching.study_matching_site.jwt.LoginFilter;
 import com.switching.study_matching_site.jwt.JWTFilter;
 import com.switching.study_matching_site.jwt.JWTUtil;
 import com.switching.study_matching_site.repository.RefreshRepository;
@@ -28,17 +28,14 @@ public class SecurityConfig {
     private final JWTUtil jwtUtil;
     private RefreshRepository refreshRepository;
     private final CustomerUserDetailsService customerUserDetailsService;
-    private final CustomAuthenticationFailureHandler jwtAccessDeniedHandler;
 
     @Autowired
     public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil,
-                          RefreshRepository refreshRepository, CustomerUserDetailsService customerUserDetailsService
-    , CustomAuthenticationFailureHandler jwtAccessDeniedHandler) {
+                          RefreshRepository refreshRepository, CustomerUserDetailsService customerUserDetailsService) {
         this.authenticationConfiguration = authenticationConfiguration;
         this.jwtUtil = jwtUtil;
         this.refreshRepository = refreshRepository;
         this.customerUserDetailsService = customerUserDetailsService;
-        this.jwtAccessDeniedHandler = jwtAccessDeniedHandler;
     }
 
     // 비밀번호 암호화
@@ -82,9 +79,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers(
                                 "/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**",
-                                "/login",
+                                "/members/login",
                                 "/", "/members",
-                                "/reissue").permitAll()// 해당 경로에서는 모든 권한를 허용함
+                                "/members/reissue").permitAll()// 해당 경로에서는 모든 권한를 허용함
                         .anyRequest().authenticated()); // 나머지 요청에서는 로그인한 사람만 들어갈 수 있음.
 
 
@@ -92,15 +89,14 @@ public class SecurityConfig {
         // 필터 추가 LoginFilter()는 인자를 받음
         // (AuthenticationManager() 메소드에 authenticationConfiguration 객체를 넣어야 함) 따라서 등록 필요
         http
-                .addFilterBefore(new JWTFilter(jwtUtil, customerUserDetailsService), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshRepository), LogoutFilter.class);
-
+                .addFilterBefore(new JWTFilter(jwtUtil, customerUserDetailsService), LoginFilter.class);
         http
-                .exceptionHandling((exceptionHandling) ->
-                        exceptionHandling
-                                // .authenticationEntryPoint(jwtAuthenticationEntryPoint) //customEntryPoint
-                                .accessDeniedHandler(jwtAccessDeniedHandler) // cutomAccessDeniedHandler
-                );
+                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, refreshRepository),
+                        UsernamePasswordAuthenticationFilter.class);
+        http
+                .addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshRepository),
+                        LogoutFilter.class);
+
         
         //세션을 STATELESS 상태로 설정
         http
@@ -109,6 +105,4 @@ public class SecurityConfig {
 
         return http.build();
     }
-
-
 }
