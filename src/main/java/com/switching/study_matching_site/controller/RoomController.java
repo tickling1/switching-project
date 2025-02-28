@@ -1,5 +1,6 @@
 package com.switching.study_matching_site.controller;
 
+import com.switching.study_matching_site.dto.condition.RoomSearchCond;
 import com.switching.study_matching_site.dto.room.PageResponseDto;
 import com.switching.study_matching_site.dto.room.RoomDetail;
 import com.switching.study_matching_site.dto.room.RoomInfoResponseDto;
@@ -60,6 +61,11 @@ public class RoomController {
     public PageResponseDto<RoomInfoResponseDto> roomList() {
         roomService.roomInfoList();
         return roomService.roomInfoList();
+    }
+
+    @GetMapping("/rooms/search")
+    public Page<RoomInfoResponseDto> searchRoomList(@RequestBody RoomSearchCond roomSearchCond) {
+        return roomService.roomSearchInfoList(roomSearchCond);
     }
 
     // 방 수정 - 권한자가 수정 가능

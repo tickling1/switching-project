@@ -1,7 +1,6 @@
 package com.switching.study_matching_site.config;
 
 import com.switching.study_matching_site.jwt.CustomLogoutFilter;
-import com.switching.study_matching_site.jwt.LoginFilter;
 import com.switching.study_matching_site.jwt.JWTFilter;
 import com.switching.study_matching_site.jwt.JWTUtil;
 import com.switching.study_matching_site.repository.RefreshRepository;

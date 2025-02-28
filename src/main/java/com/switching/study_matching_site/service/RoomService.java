@@ -1,6 +1,7 @@
 package com.switching.study_matching_site.service;
 
 import com.switching.study_matching_site.domain.*;
+import com.switching.study_matching_site.dto.condition.RoomSearchCond;
 import com.switching.study_matching_site.dto.room.*;
 import com.switching.study_matching_site.exception.ErrorCode;
 import com.switching.study_matching_site.exception.InvalidValueException;
@@ -60,6 +61,11 @@ public class RoomService {
         }
     }
 
+    @Transactional(readOnly = true)
+    public Page<RoomInfoResponseDto> roomSearchInfoList(RoomSearchCond roomSearchCond) {
+        PageRequest pageRequest = PageRequest.of(0, 10);
+        return roomRepository.searchRoom(roomSearchCond, pageRequest);
+    }
     // 스터디 방 전체 목록
     @Transactional(readOnly = true)
     public PageResponseDto<RoomInfoResponseDto> roomInfoList() {
