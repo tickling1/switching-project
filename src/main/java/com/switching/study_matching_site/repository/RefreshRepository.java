@@ -6,9 +6,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface RefreshRepository extends JpaRepository<Refresh, Long> {
 
-    @Transactional
-    Refresh save(String refresh);
-
     Boolean existsByRefresh(String refresh);
 
     @Transactional

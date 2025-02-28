@@ -24,13 +24,14 @@ public class CustomLogoutFilter extends GenericFilter {
     private void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
         //path and method verify
         String requestUri = request.getRequestURI();
-        if (!requestUri.matches("/logout")) {
+        if (!requestUri.matches("/members/logout")) {
 
             filterChain.doFilter(request, response);
             return;
         }
         String requestMethod = request.getMethod();
         if (!requestMethod.equals("POST")) {
+
             filterChain.doFilter(request, response);
             return;
         }

@@ -2,16 +2,15 @@ package com.switching.study_matching_site.service;
 
 import com.switching.study_matching_site.SecurityUtil;
 import com.switching.study_matching_site.domain.*;
+import com.switching.study_matching_site.dto.member.CustomUserDetails;
 import com.switching.study_matching_site.dto.notice.NoticeCreate;
 import com.switching.study_matching_site.dto.notice.NoticeRead;
 import com.switching.study_matching_site.dto.notice.NoticeUpdate;
-import com.switching.study_matching_site.exception.EntityNotFoundException;
-import com.switching.study_matching_site.exception.ErrorCode;
-import com.switching.study_matching_site.exception.InvalidValueException;
 import com.switching.study_matching_site.repository.NoticeRepository;
 import com.switching.study_matching_site.repository.ParticipationRepository;
 import com.switching.study_matching_site.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,10 +41,10 @@ public class NoticeService {
                 Notice savedNotice = noticeRepository.save(newNotice);
                 return savedNotice.getId();
             } else {
-                throw new InvalidValueException(ErrorCode.NOTICE_FORBIDDEN);
+                throw new IllegalStateException("방장만 공지사항을 작성할 수 있습니다.");
             }
         } else {
-            throw new EntityNotFoundException(ErrorCode.ROOM_NOT_FOUND);
+            throw new IllegalStateException("방을 찾을 수 없습니다.");
         }
     }
 
@@ -57,7 +56,7 @@ public class NoticeService {
             NoticeRead noticeRead = NoticeRead.fromEntity(findNotice.get());
             return noticeRead;
         } else {
-            throw new EntityNotFoundException(ErrorCode.NOTICE_NOT_FOUND);
+            throw new IllegalStateException("찾으려는 공지사항이 없습니다.");
         }
     }
 
@@ -75,10 +74,10 @@ public class NoticeService {
                 if (notice.getNoticeTitle() != null) notice.setNoticeTitle(noticeUpdateDto.getTitle());
                 if (notice.getNoticeContent() != null) notice.setNoticeContent(noticeUpdateDto.getContent());
             } else {
-                throw new EntityNotFoundException(ErrorCode.NOTICE_NOT_FOUND);
+                throw new IllegalStateException("찾으려는 공지사항이 없습니다. 공지사항을 먼저 생성해주세요.");
             }
         } else {
-            throw new InvalidValueException(ErrorCode.NOTICE_FORBIDDEN);
+            throw new IllegalStateException("공지사항은 방장만 수정할 수 있습니다.");
         }
     }
 }
