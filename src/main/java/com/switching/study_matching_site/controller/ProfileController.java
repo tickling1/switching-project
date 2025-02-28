@@ -1,6 +1,5 @@
 package com.switching.study_matching_site.controller;
 
-import com.switching.study_matching_site.dto.notice.NoticeRead;
 import com.switching.study_matching_site.dto.profile.ProfileCreateDto;
 import com.switching.study_matching_site.dto.profile.ProfileReadDto;
 import com.switching.study_matching_site.dto.profile.ProfileUpdateDto;
@@ -14,6 +13,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -67,10 +68,10 @@ public class ProfileController {
             @Parameter(name = "profileId", description = "프로필 ID", in = ParameterIn.PATH)
     })
     @PutMapping("/members/{memberId}/profile/{profileId}")
-    public String update(@PathVariable Long profileId,
-                         @RequestBody ProfileUpdateDto profileUpdateDto) {
+    public ResponseEntity<Void> update(@PathVariable Long profileId,
+                                 @RequestBody ProfileUpdateDto profileUpdateDto) {
         profileService.updateProfile(profileId, profileUpdateDto);
-        return "OK";
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }

@@ -64,7 +64,7 @@ public class RoomController {
 
     // 방 수정 - 권한자가 수정 가능
     @Operation(summary = "방 내용 수정", description = "방 내용을 수정합니다.")
-            @PutMapping("/rooms/{roomId}")
+    @PutMapping("/rooms/{roomId}")
     public String updateRoom(@Parameter(description = "방 ID")
                                  @PathVariable(name = "roomId")Long roomId,
                              @RequestBody RoomUpdate roomUpdateDto) {
