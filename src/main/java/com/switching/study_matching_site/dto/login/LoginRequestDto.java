@@ -1,4 +1,4 @@
-package com.switching.study_matching_site.dto.member;
+package com.switching.study_matching_site.dto.login;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
@@ -9,7 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 @Setter
 @Schema(description = "로그인 요청 DTO")
-public class LoginDto {
+public class LoginRequestDto {
 
     @Schema(name = "아이디")
     private String loginId;

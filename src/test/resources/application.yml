@@ -20,9 +20,14 @@ spring:
         dialect: org.hibernate.dialect.H2Dialect
 
 # ${환경변수} 로 숨기기
+# jasypt.encryptor.password=${JASYPT_ENCRYPTOR_PASSWORD}
+# 1. Run/Debug Configurations를 열기
+# 2. 애플리케이션을 선택한 후, 환경 변수 부분에 JASYPT_ENCRYPTOR_PASSWORD와 값(NAME, VALUE)을 추가
 jasypt:
   encryptor:
     password: encryptTestKey
+
+
 
 logging.level:
   org.hibernate.SQL: debug

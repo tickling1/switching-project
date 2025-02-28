@@ -1,7 +1,7 @@
 package com.switching.study_matching_site;
 
 import com.switching.study_matching_site.domain.Member;
-import com.switching.study_matching_site.dto.member.CustomUserDetails;
+import com.switching.study_matching_site.jwt.CustomUserDetails;
 import com.switching.study_matching_site.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;

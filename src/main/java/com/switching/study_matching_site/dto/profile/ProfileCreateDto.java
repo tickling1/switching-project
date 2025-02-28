@@ -26,8 +26,7 @@ public class ProfileCreateDto {
     private Boolean isOffline; // true면 오프라인, false면 온라인
 
     @Schema(description = "스터디 사용 기술", example = "JAVA, PYTHON, KOTLIN, C, JAVASCRIPT")
-    @Pattern(regexp = "JAVA|PYTHON|KOTLIN|C|JAVASCRIPT",
-            message = "언어는 JAVA, PYTHON, KOTLIN, C, JAVASCRIPT 중 하나여야 합니다.")
+    // @Pattern(regexp = "JAVA|PYTHON|KOTLIN|C|JAVASCRIPT", message = "언어는 JAVA, PYTHON, KOTLIN, C, JAVASCRIPT 중 하나여야 합니다.")
     private TechSkill techSkill; // JAVA, PYTHON, KOTLIN, C, JAVASCRIPT
 
     //@NotNull
@@ -35,8 +34,7 @@ public class ProfileCreateDto {
     private Integer desiredLevel; // 1 ~ 3
 
     @Schema(description = "스터디 목적", example = "STUDY, PORTFOLIO, IMPROVE, STARTUP")
-    @Pattern(regexp = "공부|포트폴리오|실력향상|창업",
-            message = "목표는 공부, 포트폴리오, 실력향상, 창업 중 하나여야 합니다.")
+    // @Pattern(regexp = "공부|포트폴리오|실력향상|창업", message = "목표는 공부, 포트폴리오, 실력향상, 창업 중 하나여야 합니다.")
 
     private Goal studyGoal; // 공부, 포트폴리오, 실력향상, 창업
 
