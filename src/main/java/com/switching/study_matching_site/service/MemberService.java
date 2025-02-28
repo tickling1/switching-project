@@ -1,14 +1,19 @@
 package com.switching.study_matching_site.service;
 
+import com.switching.study_matching_site.SecurityUtil;
 import com.switching.study_matching_site.domain.EnterStatus;
 import com.switching.study_matching_site.domain.Member;
-import com.switching.study_matching_site.dto.member.LoginDto;
+import com.switching.study_matching_site.dto.login.LoginRequestDto;
 import com.switching.study_matching_site.dto.member.MemberCreateDto;
 import com.switching.study_matching_site.dto.member.MemberReadDto;
 import com.switching.study_matching_site.dto.member.MemberUpdateDto;
+import com.switching.study_matching_site.exception.EntityNotFoundException;
+import com.switching.study_matching_site.exception.ErrorCode;
+import com.switching.study_matching_site.exception.InvalidValueException;
 import com.switching.study_matching_site.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +27,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final SecurityUtil securityUtil;
 
     /**
      * 회원 가입 - 중복 회원 검증 후 가입
@@ -34,47 +40,18 @@ public class MemberService {
         return savedMember.getId();
     }
 
-
-    /**
-     * 회원 로그인
-     */
-    public MemberCreateDto tryLogin(LoginDto loginDto) {
-
-        Optional<Member> loginMember = memberRepository.findByLoginId(loginDto.getLoginId());
-        if (loginMember.isPresent()) {
-            Member member = loginMember.get();
-            if (bCryptPasswordEncoder.matches(loginDto.getPassword(), member.getPassword())) {
-                return MemberCreateDto.fromEntity(member);
-            } else {
-                throw new IllegalStateException("아이디 또는 비밀번호가 틀립니다.");
-            }
-
-        } else {
-            throw new IllegalStateException("일치하는 아이디가 없습니다.");
-        }
-    }
-
-    public Long findMemberId(String loginId) {
-        Optional<Member> findMember = memberRepository.findByLoginId(loginId);
-        if (findMember.isPresent()) {
-            return findMember.get().getId();
-        } else {
-            return null;
-        }
-    }
-
     /**
      * 비밀번호 찾기 - 로그인 ID로 조회 후 결과 반환
      */
-    public String forgetPassword(LoginDto loginDto) {
-        Optional<Member> findMember = memberRepository.findMemberByLoginId(loginDto.getLoginId());
+    public String forgetPassword(LoginRequestDto loginRequestDto) {
+        Optional<Member> findMember = memberRepository.findMemberByLoginId(loginRequestDto.getLoginId());
         if (findMember.isPresent()) {
             Member member = findMember.get();
             String randomPassword = RandomStringUtils.randomAlphabetic(8);
             member.setPassword(randomPassword);
             return randomPassword;
         } else {
-            throw new IllegalStateException("존재하는 회원이 없습니다.");
+            throw new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND);
         }
     }
 
@@ -107,12 +84,14 @@ public class MemberService {
      */
     @Transactional(readOnly = true)
     public MemberReadDto myInfo(Long memberId) {
+        Long accessMemberId = securityUtil.getMemberIdByUserDetails();
         Optional<Member> findMember = memberRepository.findById(memberId);
-        if (findMember.isPresent()) {
+
+        if (findMember.isPresent() && accessMemberId.equals(findMember.get().getId())) {
             return MemberReadDto.fromEntity(findMember.get());
 
         } else {
-            return null;
+            throw new InvalidValueException(ErrorCode.ACCESS_DENIED);
         }
     }
 
@@ -124,14 +103,19 @@ public class MemberService {
     private void validateDuplicateMember(MemberCreateDto memberCreateDTO) {
         Optional<Member> findMember = memberRepository.findByLoginId(memberCreateDTO.getLoginId());
         if (findMember.isPresent()) {
-            throw new IllegalStateException("이미 존재하는 아이디 입니다.");
+            throw new InvalidValueException(ErrorCode.LOGIN_ID_DUPLICATION );
+        }
+        Optional<Member> findMemberEmail = memberRepository.findByEmail(memberCreateDTO.getEmail());
+        if (findMemberEmail.isPresent()) {
+            throw new InvalidValueException(ErrorCode.EMAIL_DUPLICATION);
         }
     }
 
+    @Profile("dev")
     @Transactional
     public void initData() {
         Member member = new Member();
-        member.setLoginId("ksw");
+        member.setLoginId("kqk1ds");
         member.setUsername("김승우");
         member.setEnterStatus(EnterStatus.OUT);
         member.setPassword(bCryptPasswordEncoder.encode("1234"));

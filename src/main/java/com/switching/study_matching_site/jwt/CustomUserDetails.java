@@ -1,4 +1,4 @@
-package com.switching.study_matching_site.dto.member;
+package com.switching.study_matching_site.jwt;
 
 import com.switching.study_matching_site.domain.Member;
 import org.springframework.security.core.GrantedAuthority;

@@ -5,6 +5,8 @@ import com.switching.study_matching_site.domain.Member;
 import com.switching.study_matching_site.domain.Room;
 import com.switching.study_matching_site.dto.chat.ChatCreate;
 import com.switching.study_matching_site.dto.chat.ChatRead;
+import com.switching.study_matching_site.exception.EntityNotFoundException;
+import com.switching.study_matching_site.exception.ErrorCode;
 import com.switching.study_matching_site.repository.ChatRepository;
 import com.switching.study_matching_site.repository.MemberRepository;
 import com.switching.study_matching_site.repository.RoomRepository;
@@ -33,13 +35,14 @@ public class ChatService {
         Chat savedChat = chatCreateDto.toEntity();
         Optional<Room> findRoom = roomRepository.findById(roomId);
         Optional<Member> findMember = memberRepository.findById(memberId);
+
         if (findRoom.isPresent() && findMember.isPresent()) {
             savedChat.setRoom(findRoom.get());
             savedChat.setWriter(findMember.get().getUsername());
             Chat entity = chatRepository.save(savedChat);
             return ChatRead.fromEntity(entity);
         } else {
-            throw new IllegalStateException("방을 찾지 못했습니다.");
+            throw new EntityNotFoundException(ErrorCode.ROOM_NOT_FOUND);
         }
     }
 
@@ -58,10 +61,10 @@ public class ChatService {
                 }
                 return chatReads;
             } else {
-                throw new IllegalStateException("채팅을 불러오는데 실패하였습니다.");
+                throw new EntityNotFoundException(ErrorCode.CHAT_NOT_FOUND);
             }
         } else {
-            throw new IllegalStateException("방을 찾지 못했습니다.");
+            throw new EntityNotFoundException(ErrorCode.ROOM_NOT_FOUND);
         }
     }
 }

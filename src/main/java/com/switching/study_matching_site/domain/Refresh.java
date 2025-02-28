@@ -22,4 +22,13 @@ public class Refresh {
     
     // 만료 시간
     private String expiration;
+
+    protected Refresh() {
+    }
+
+    public Refresh(String loginId, String refresh, String expiration) {
+        this.loginId = loginId;
+        this.refresh = refresh;
+        this.expiration = expiration;
+    }
 }
