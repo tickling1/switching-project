@@ -5,6 +5,7 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.switching.study_matching_site.domain.*;
 import com.switching.study_matching_site.dto.condition.RoomSearchCond;
+import com.switching.study_matching_site.dto.matching.ProfileCond;
 import com.switching.study_matching_site.dto.room.QRoomInfoResponseDto;
 import com.switching.study_matching_site.dto.room.RoomInfoResponseDto;
 import jakarta.persistence.EntityManager;
@@ -31,7 +32,8 @@ public class RoomRepositoryImpl implements RoomRepositoryCustom {
                 .select(new QRoomInfoResponseDto(
                         room.roomTitle,
                         room.currentCount,
-                        room.maxCount
+                        room.maxCount,
+                        room.uuid
                 ))
                 .from(room)
                 .where(
@@ -61,8 +63,43 @@ public class RoomRepositoryImpl implements RoomRepositoryCustom {
         return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetchOne());
     }
 
+    @Override
+    public Page<RoomInfoResponseDto> matchingRoom(ProfileCond condition, Pageable pageable) {
+        List<RoomInfoResponseDto> content = queryFactory
+                .select(new QRoomInfoResponseDto(
+                        room.roomTitle,
+                        room.currentCount,
+                        room.maxCount,
+                        room.uuid
+                ))
+                .from(room)
+                .where(
+                        roomTechSkillEq(condition.getTechSkill()),
+                        roomGoalEq(condition.getStudyGoal()),
+                        studyRegionEq(condition.getRegion()),
+                        studyIsOfflineEq(condition.getIsOfflineStatus())
+                )
+                .orderBy(room.roomTitle.asc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        // 전체 개수 조회
+        JPAQuery<Long> countQuery = queryFactory
+                .select(room.count())
+                .from(room)
+                .where(
+                        roomTechSkillEq(condition.getTechSkill()),
+                        roomGoalEq(condition.getStudyGoal()),
+                        studyRegionEq(condition.getRegion()),
+                        studyIsOfflineEq(condition.getIsOfflineStatus())
+                );
+
+        return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetchOne());
+    }
+
     private BooleanExpression roomNameEq(String roomNameCond) {
-        return roomNameCond != null ? room.roomTitle.eq(roomNameCond) : null;
+        return roomNameCond != null ? room.roomTitle.contains(roomNameCond) : null;
     }
     private BooleanExpression roomTechSkillEq(TechSkill roomTechSkillCond) {
         return roomTechSkillCond != null ? room.techSkill.eq(roomTechSkillCond) : null;

@@ -20,11 +20,15 @@ public class RoomInfoResponseDto {
     @Schema(description = "방 최대 인원")
     private Integer maxCount;
 
+    @Schema(description = "방 UUID")
+    private String uuid;
+
     @QueryProjection
-    public RoomInfoResponseDto(String roomTitle, Integer currentCount, Integer maxCount) {
+    public RoomInfoResponseDto(String roomTitle, Integer currentCount, Integer maxCount, String uuid) {
         this.roomTitle = roomTitle;
         this.currentCount = currentCount;
         this.maxCount = maxCount;
+        this.uuid = uuid;
     }
 
     public static RoomInfoResponseDto fromEntity(Room room) {
@@ -32,15 +36,17 @@ public class RoomInfoResponseDto {
                 .roomTitle(room.getRoomTitle())
                 .currentCount(room.getCurrentCount())
                 .maxCount(room.getMaxCount())
+                .uuid(room.getUuid())
                 .build();
     }
 
     @Override
     public String toString() {
-        return "RoomInfo{" +
+        return "RoomInfoResponseDto{" +
                 "roomTitle='" + roomTitle + '\'' +
                 ", currentCount=" + currentCount +
                 ", maxCount=" + maxCount +
+                ", uuid='" + uuid + '\'' +
                 '}';
     }
 }
