@@ -6,7 +6,7 @@ spring:
     active: dev
 
   jwt:
-    secret: ENC(Sa9wLuzb+ZdcAw6iGxOw67rSdpu2nGv0mOXWqbppluqQjxHmaET/8peDAoAhmZ5POXvotgUL13y3XzeWNi73DA==)# applicaton-dev.yml
+    secret: ENC(Sa9wLuzb+ZdcAw6iGxOw67rSdpu2nGv0mOXWqbppluqQjxHmaET/8peDAoAhmZ5POXvotgUL13y3XzeWNi73DA==)
 
   datasource:
     url: ENC(IxWZd7iLU/V9qi8AT63ALcmAhRWD3TKqOQQPv0wNRtltexkp0AWaRCyvZ1CwG9tWck0qdRO1WRs=)

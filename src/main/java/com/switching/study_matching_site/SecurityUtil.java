@@ -2,6 +2,9 @@ package com.switching.study_matching_site;
 
 import com.switching.study_matching_site.domain.Member;
 import com.switching.study_matching_site.dto.member.CustomUserDetails;
+import com.switching.study_matching_site.exception.EntityNotFoundException;
+import com.switching.study_matching_site.exception.ErrorCode;
+import com.switching.study_matching_site.exception.InvalidValueException;
 import com.switching.study_matching_site.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -22,7 +25,7 @@ public class SecurityUtil {
         if (findMember.isPresent()) {
             return findMember.get();
         } else {
-            throw new IllegalStateException("잘못된 사용자 접근입니다.");
+            throw new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND);
         }
     }
 
