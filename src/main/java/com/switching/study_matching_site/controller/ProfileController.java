@@ -14,6 +14,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,10 +37,10 @@ public class ProfileController {
                             )
                     )
             })
-    @PostMapping("/members/{memberId}/profile")
-    public String post(@PathVariable(name = "memberId") Long memberId,
-                       @RequestBody @Validated ProfileCreateDto profileCreateDto) {
-        return profileService.writeProfile(profileCreateDto, memberId).toString();
+    @PostMapping("/profile")
+    public ResponseEntity<Void> postProfile(@RequestBody @Validated ProfileCreateDto profileCreateDto) {
+        profileService.writeProfile(profileCreateDto);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Operation(summary = "프로필 조회", description = "프로필을 조회합니다.",
@@ -53,12 +55,11 @@ public class ProfileController {
                     )
             })
     @Parameters({
-            @Parameter(name = "memberId", description = "members의 id", in = ParameterIn.PATH),
             @Parameter(name = "profileId", description = "프로필 ID", in = ParameterIn.PATH)
     })
-    @GetMapping("/members/{memberId}/profile/{profileId}")
-    public String read(@PathVariable Long memberId, @PathVariable Long profileId) {
-        return profileService.readProfile(memberId, profileId).toString();
+    @GetMapping("/profile/{profileId}")
+    public String read( @PathVariable Long profileId) {
+        return profileService.readProfile( profileId).toString();
     }
 
     @Operation(summary = "프로필 수정", description = "프로필을 수정합니다.")
@@ -66,11 +67,10 @@ public class ProfileController {
             @Parameter(name = "memberId", description = "members의 id", in = ParameterIn.PATH),
             @Parameter(name = "profileId", description = "프로필 ID", in = ParameterIn.PATH)
     })
-    @PutMapping("/members/{memberId}/profile/{profileId}")
-    public String update(@PathVariable Long profileId,
-                         @RequestBody ProfileUpdateDto profileUpdateDto) {
+    @PutMapping("/profile/{profileId}")
+    public ResponseEntity<Void> update(@PathVariable Long profileId, @RequestBody ProfileUpdateDto profileUpdateDto) {
         profileService.updateProfile(profileId, profileUpdateDto);
-        return "OK";
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }

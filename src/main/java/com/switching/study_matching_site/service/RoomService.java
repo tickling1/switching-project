@@ -3,6 +3,7 @@ package com.switching.study_matching_site.service;
 import com.switching.study_matching_site.domain.*;
 import com.switching.study_matching_site.dto.condition.RoomSearchCond;
 import com.switching.study_matching_site.dto.room.*;
+import com.switching.study_matching_site.exception.EntityNotFoundException;
 import com.switching.study_matching_site.exception.ErrorCode;
 import com.switching.study_matching_site.exception.InvalidValueException;
 import com.switching.study_matching_site.repository.RoomRepository;
@@ -13,7 +14,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
@@ -27,7 +27,7 @@ public class RoomService {
     private final RoomRepository roomRepository;
 
     // 스터디 방 생성
-    public Long createRoom(RoomCreate roomCreateDto) {
+    public Long createRoom(RoomCreateDto roomCreateDto) {
         Room entity = roomCreateDto.toEntity();
         // 방 UUID 설정
         entity.setUuid(UUID.randomUUID().toString());
@@ -36,16 +36,16 @@ public class RoomService {
     }
 
     // 스터디 방 상세 조회
-    public RoomDetail findRoomById(Long roomId) {
+    public RoomDetailDto findRoomById(Long roomId) {
         Optional<Room> findRoom = roomRepository.findById(roomId);
         if (findRoom.isPresent()) {
-            return RoomDetail.fromEntity(findRoom.get());
+            return RoomDetailDto.fromEntity(findRoom.get());
         }
-        return null;
+        throw new EntityNotFoundException(ErrorCode.ROOM_NOT_FOUND);
     }
 
     // 스터디 방 수정
-    public void updateRoom(Long roomId, RoomUpdate roomUpdateDto) {
+    public void updateRoom(Long roomId, RoomUpdateDto roomUpdateDto) {
         Optional<Room> findRoom = roomRepository.findById(roomId);
         if (findRoom.isPresent()) {
             Room room = findRoom.get();
@@ -66,6 +66,7 @@ public class RoomService {
         PageRequest pageRequest = PageRequest.of(0, 10);
         return roomRepository.searchRoom(roomSearchCond, pageRequest);
     }
+
     // 스터디 방 전체 목록
     @Transactional(readOnly = true)
     public PageResponseDto<RoomInfoResponseDto> roomInfoList() {
