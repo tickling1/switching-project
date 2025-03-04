@@ -17,8 +17,8 @@ public class Profile {
     @Column(name = "PROFILE_ID")
     private Long id;
 
-    @Column(name = "IS_OFFLINE", columnDefinition = "boolean default false")
-    private Boolean isOffline; // true면 오프라인, false면 온라인
+    @Column(name = "IS_OFFLINE")
+    private OfflineStatus offlineStatus;
 
     @Enumerated(EnumType.STRING)
     private TechSkill techSkill; // JAVA, PYTHON, KOTLIN, C, JAVASCRIPT

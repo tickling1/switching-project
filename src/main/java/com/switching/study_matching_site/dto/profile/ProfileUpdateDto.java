@@ -1,10 +1,7 @@
 package com.switching.study_matching_site.dto.profile;
 
 import com.switching.study_matching_site.annotation.ValidRegion;
-import com.switching.study_matching_site.domain.Goal;
-import com.switching.study_matching_site.domain.Profile;
-import com.switching.study_matching_site.domain.Region;
-import com.switching.study_matching_site.domain.TechSkill;
+import com.switching.study_matching_site.domain.*;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Pattern;
@@ -26,7 +23,7 @@ public class ProfileUpdateDto {
     private Long id;
 
     @Schema(description = "오프라인 여부", example = "OFFLINE, ONLINEb")
-    private Boolean isOffline; // true면 오프라인, false면 온라인
+    private OfflineStatus isOffline; // true면 오프라인, false면 온라인
 
     @Schema(description = "스터디 사용 기술", example = "JAVA, PYTHON, KOTLIN, C, JAVASCRIPT")
     @Pattern(regexp = "공부|포트폴리오|실력향상|창업",
@@ -58,7 +55,7 @@ public class ProfileUpdateDto {
 
     public Profile toProfile() {
         Profile entity = new Profile();
-        entity.setIsOffline(this.isOffline);
+        entity.setOfflineStatus(this.isOffline);
         entity.setTechSkill(this.techSkill);
         entity.setDesiredLevel(this.desiredLevel);
         entity.setStudyGoal(this.studyGoal);
@@ -73,7 +70,7 @@ public class ProfileUpdateDto {
 
         return new ProfileUpdateDto(
                 profile.getId(),
-                profile.getIsOffline(),
+                profile.getOfflineStatus(),
                 profile.getTechSkill(),
                 profile.getDesiredLevel(),
                 profile.getStudyGoal(),

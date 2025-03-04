@@ -15,7 +15,7 @@ import java.time.LocalTime;
 public class ProfileReadDto {
 
 
-    private Boolean isOffline; // true면 오프라인, false면 온라인
+    private OfflineStatus isOffline; // true면 오프라인, false면 온라인
 
     private TechSkill techSkill; // JAVA, PYTHON, KOTLIN, C, JAVASCRIPT
 
@@ -33,7 +33,7 @@ public class ProfileReadDto {
 
     public Profile toProfile() {
         Profile entity = new Profile();
-        entity.setIsOffline(this.isOffline);
+        entity.setOfflineStatus(this.isOffline);
         entity.setTechSkill(this.techSkill);
         entity.setDesiredLevel(this.desiredLevel);
         entity.setStudyGoal(this.studyGoal);
@@ -47,7 +47,7 @@ public class ProfileReadDto {
     public static ProfileReadDto fromProfile(Profile profile) {
 
         return new ProfileReadDto(
-                profile.getIsOffline(),
+                profile.getOfflineStatus(),
                 profile.getTechSkill(),
                 profile.getDesiredLevel(),
                 profile.getStudyGoal(),

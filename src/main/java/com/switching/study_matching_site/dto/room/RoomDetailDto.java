@@ -8,7 +8,7 @@ import java.time.LocalTime;
 
 @Builder
 @Schema(name = "방 상세 정보 응답 DTO")
-public class RoomDetail {
+public class RoomDetailDto {
 
     private Long id;
 
@@ -48,8 +48,8 @@ public class RoomDetail {
     @Schema(description = "오프라인 여부", example = "OFFLINE, ONLINEb")
     private OfflineStatus offlineStatus;
 
-    public static RoomDetail fromEntity(Room room) {
-        return RoomDetail.builder()
+    public static RoomDetailDto fromEntity(Room room) {
+        return RoomDetailDto.builder()
                 .id(room.getId())
                 .roomTitle(room.getRoomTitle())
                 .uuid(room.getUuid())

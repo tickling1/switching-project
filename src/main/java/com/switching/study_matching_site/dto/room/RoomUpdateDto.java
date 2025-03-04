@@ -6,12 +6,11 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalTime;
-import java.util.UUID;
 
 @Builder
 @Getter
 @Setter
-public class RoomUpdate {
+public class RoomUpdateDto {
 
     private String roomTitle;
     private Integer maxCount;

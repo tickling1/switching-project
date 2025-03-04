@@ -1,15 +1,11 @@
 package com.switching.study_matching_site.controller;
 
-import com.switching.study_matching_site.dto.notice.NoticeRead;
-import com.switching.study_matching_site.dto.room.RoomCreate;
+import com.switching.study_matching_site.dto.room.RoomCreateDto;
 import com.switching.study_matching_site.service.ParticipationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -24,11 +20,9 @@ public class ParticipationController {
 
     // 멤버가 방 생성
     @Operation(summary = "방 생성", description = "회원이 방을 생성합니다.")
-    @PostMapping("/{memberId}/rooms")
-    public Long memberCreateRoom(@Parameter(name = "memberId", description = "members의 id", in = ParameterIn.PATH)
-                                     @PathVariable(name = "memberId")Long memberId,
-                                 @RequestBody RoomCreate roomCreateDto) {
-        return participationService.newParticipation(memberId, roomCreateDto);
+    @PostMapping("/rooms")
+    public Long memberCreateRoom(@RequestBody RoomCreateDto roomCreateDto) {
+        return participationService.newParticipation(roomCreateDto);
     }
 
     // 멤버가 방 참여

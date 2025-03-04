@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @Builder
 @Schema(name = "방 생성 요청 DTO")
-public class RoomCreate {
+public class RoomCreateDto {
 
     @Schema(description = "방 제목")
     private String roomTitle;
