@@ -27,6 +27,8 @@ public interface FriendRequestRepository extends JpaRepository<FriendRequest, Lo
     // 특정 사용자의 친구 신청 내용
     @Query("SELECT f FROM FriendRequest f WHERE f.sender.id =:senderId AND f.receiver.id =:receiverId")
     Optional<FriendRequest> findBySenderAndReceiver(@Param("senderId") Long senderId, @Param("receiverId") Long receiverId);
-
+    // 친구 상태(status = ACCEPTED)
+    @Query("SELECT f FROM FriendRequest f WHERE (f.sender.id =:memberId OR f.receiver.id =:memberId) AND f.status =:status")
+    Optional<FriendRequest> alreadyFriendStatus (@Param("memberId") Long memberId, @Param("status") RequestStatus status);
 
 }

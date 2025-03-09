@@ -98,23 +98,4 @@ public class MemberController {
         memberService.updateMember(memberId, memberUpdateDto);
         return "수정 완료";
     }
-
-    @Operation(summary = "회원 로그인", description = "회원로그인을 시도합니다.",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "회원 로그인 성공",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(
-                                            implementation = MemberCreateDto.class
-                                    )
-                            )
-                    )
-            })
-    @PostMapping("/members/login")
-    public String loginMember(@RequestBody LoginDto loginDto) {
-        MemberCreateDto findMemberCreateDto = memberService.tryLogin(loginDto);
-        return findMemberCreateDto.toString();
-    }
 }

@@ -1,7 +1,11 @@
 package com.switching.study_matching_site.service;
 
+import com.switching.study_matching_site.SecurityUtil;
 import com.switching.study_matching_site.domain.*;
-import com.switching.study_matching_site.dto.room.RoomCreate;
+import com.switching.study_matching_site.dto.room.RoomCreateDto;
+import com.switching.study_matching_site.exception.EntityNotFoundException;
+import com.switching.study_matching_site.exception.ErrorCode;
+import com.switching.study_matching_site.exception.InvalidValueException;
 import com.switching.study_matching_site.repository.MemberRepository;
 import com.switching.study_matching_site.repository.ParticipationRepository;
 import com.switching.study_matching_site.repository.RoomRepository;
@@ -20,9 +24,11 @@ public class ParticipationService {
     private final ParticipationRepository participationRepository;
     private final RoomRepository roomRepository;
     private final MemberRepository memberRepository;
+    private final SecurityUtil securityUtil;
 
     // 멤버Id, 방 정보가 필요함 - 방 생성
-    public Long newParticipation(Long memberId, RoomCreate roomCreateDto) {
+    public Long newParticipation(RoomCreateDto roomCreateDto) {
+        Long memberId = securityUtil.getMemberIdByUserDetails();
         isParticipation(memberId);
         Room savedRoom = roomRepository.save(roomCreateDto.toEntity());
         Optional<Member> findMember = memberRepository.findById(memberId);
@@ -42,14 +48,14 @@ public class ParticipationService {
         Optional<Member> findMember = memberRepository.findById(memberId);
         if (findRoom.isPresent() && findMember.isPresent()) {
             if (findRoom.get().getCurrentCount() > findRoom.get().getMaxCount()) {
-                throw new IllegalStateException("현재 방 인원이 가득찼습니다.");
+                throw new InvalidValueException(ErrorCode.ROOM_FULL);
             }
             Participation participation = new Participation(findRoom.get(), RoleType.USER, findMember.get());
             participation.setMember(findMember.get());
             Participation savedParticipation = participationRepository.save(participation);
             return savedParticipation.getId();
         }
-        throw new IllegalStateException("참여하려는 방이 존재하지 않습니다.");
+        throw new EntityNotFoundException(ErrorCode.ROOM_NOT_FOUND);
     }
 
     // 멤버 아이디, 룸 아이디 필요함 - 방 퇴장
@@ -65,10 +71,10 @@ public class ParticipationService {
             if (participation.isPresent()) {
                 participation.get().setLeaveDate(LocalDateTime.now());
             } else {
-                throw new IllegalStateException("참여 중인 방이 없습니다.");
+                throw new EntityNotFoundException(ErrorCode.PARTICIPATED_NOT_FOUND);
             }
         } else {
-            throw new IllegalStateException("퇴장하려는 방이 없습니다.");
+            throw new EntityNotFoundException(ErrorCode.ROOM_NOT_FOUND);
         }
     }
 
@@ -83,7 +89,7 @@ public class ParticipationService {
             Participation savedParticipation = participationRepository.save(participation);
             return savedParticipation.getId();
         }
-        throw new IllegalStateException("참여하려는 방이 존재하지 않습니다.");
+        throw new EntityNotFoundException(ErrorCode.ROOM_NOT_FOUND);
     }
 
 
@@ -95,7 +101,7 @@ public class ParticipationService {
         if (findMember.isPresent()) {
             EnterStatus enterStatus = findMember.get().getEnterStatus();
             if (enterStatus.equals(EnterStatus.ENTER)) {
-                throw new IllegalStateException("이미 참여중인 방이 있습니다.");
+                throw new InvalidValueException(ErrorCode.ALREADY_PARTICIPATED);
             }
         }
     }
