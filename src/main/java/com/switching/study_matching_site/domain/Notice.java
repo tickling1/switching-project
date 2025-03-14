@@ -28,7 +28,4 @@ public class Notice {
     private Room room;
 
     private LocalDateTime createdAt;
-
-    private LocalDateTime updatedAt;
-
 }

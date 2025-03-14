@@ -15,7 +15,6 @@ public class Participation {
     @Column(name = "PARTICIPATION_ID")
     private Long id;
 
-
     @Column(name = "ROLE_TYPE")
     @Enumerated(EnumType.STRING)
     private RoleType roleType;

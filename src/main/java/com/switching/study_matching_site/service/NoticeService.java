@@ -62,25 +62,4 @@ public class NoticeService {
             throw new EntityNotFoundException(ErrorCode.NOTICE_NOT_FOUND);
         }
     }
-
-    // 공지사항 변경 - 방 ID, 공지사항 ID
-    public void updateNotice(NoticeUpdate noticeUpdateDto, Long roomId, Long noticeId) {
-        Optional<Notice> findNotice = noticeRepository.findById(noticeId);
-        Long tryMemberId = securityUtil.getMemberIdByUserDetails();
-
-        // 멤버 룰 찾기 위해
-        Optional<Participation> findRule = participationRepository.findByRoomAndMember(roomId, tryMemberId);
-        if (findRule.get().getRoleType() == RoleType.ADMIN) {
-
-            if (findNotice.isPresent()) {
-                Notice notice = findNotice.get();
-                if (notice.getNoticeTitle() != null) notice.setNoticeTitle(noticeUpdateDto.getTitle());
-                if (notice.getNoticeContent() != null) notice.setNoticeContent(noticeUpdateDto.getContent());
-            } else {
-                throw new EntityNotFoundException(ErrorCode.NOTICE_NOT_FOUND);
-            }
-        } else {
-            throw new InvalidValueException(ErrorCode.NOTICE_FORBIDDEN);
-        }
-    }
 }

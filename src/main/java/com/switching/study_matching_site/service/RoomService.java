@@ -26,16 +26,8 @@ public class RoomService {
 
     private final RoomRepository roomRepository;
 
-    // 스터디 방 생성
-    public Long createRoom(RoomCreateDto roomCreateDto) {
-        Room entity = roomCreateDto.toEntity();
-        // 방 UUID 설정
-        entity.setUuid(UUID.randomUUID().toString());
-        Room savedRoom = roomRepository.save(entity);
-        return savedRoom.getId();
-    }
-
     // 스터디 방 상세 조회
+    @Transactional(readOnly = true)
     public RoomDetailDto findRoomById(Long roomId) {
         Optional<Room> findRoom = roomRepository.findById(roomId);
         if (findRoom.isPresent()) {
