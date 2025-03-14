@@ -23,7 +23,6 @@ public class NoticeUpdate {
         Notice notice = new Notice();
         notice.setNoticeTitle(this.title);
         notice.setNoticeContent(this.content);
-        notice.setUpdatedAt(LocalDateTime.now());
         return notice;
     }
 }

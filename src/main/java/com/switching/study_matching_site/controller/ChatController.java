@@ -33,15 +33,13 @@ public class ChatController {
                     )
             )
     })
-    @PostMapping("members/{memberId}/rooms/{roomId}/chats")
-    public String addChat(@PathVariable Long memberId,
-                          @PathVariable Long roomId,
-                          @RequestBody ChatCreate chatCreate) {
-        ChatRead chat = chatService.createChat(chatCreate, memberId, roomId);
+    @PostMapping("/rooms/{roomId}/chats")
+    public String addChat(@PathVariable Long roomId, @RequestBody ChatCreate chatCreate) {
+        ChatRead chat = chatService.createChat(chatCreate, roomId);
         return chat.toString();
     }
     
-    @Operation(summary = "채팅 읽기", description = "채팅 내역을 확인합니다.", responses = {
+    @Operation(summary = "채팅 불러오기", description = "채팅 내역을 확인합니다.", responses = {
             @ApiResponse(
                     responseCode = "200",
                     description = "채팅 내역 조회 성공",
