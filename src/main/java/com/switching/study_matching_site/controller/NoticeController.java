@@ -16,6 +16,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -54,17 +56,5 @@ public class NoticeController {
                              @PathVariable(name = "noticeId") Long noticeId) {
         NoticeRead noticeRead = noticeService.readNotice(roomId, noticeId);
         return noticeRead.toString();
-    }
-
-    @Operation(summary = "공지사항 수정", description = "공지사항을 수정합니다.")
-    @Parameters({
-            @Parameter(name = "roomId", description = "채팅방 ID", in = ParameterIn.PATH),
-            @Parameter(name = "noticeId", description = "공지사항 번호", in = ParameterIn.PATH)
-    })
-    @PutMapping("/rooms/{roomId}/notice/{noticeId}")
-    public String updateNotice(@RequestBody NoticeUpdate noticeUpdate,
-                               @PathVariable Long roomId, @PathVariable Long noticeId) {
-        noticeService.updateNotice(noticeUpdate, roomId, noticeId);
-        return "수정 완료";
     }
 }
