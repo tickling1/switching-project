@@ -1,0 +1,1 @@
+[![Deploy Spring Boot to AWS](https://github.com/tickling1/switching-project/actions/workflows/gradle.yml/badge.svg?branch=main)](https://github.com/tickling1/switching-project/actions/workflows/gradle.yml)
