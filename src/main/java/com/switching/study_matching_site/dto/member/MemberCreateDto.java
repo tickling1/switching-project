@@ -92,6 +92,7 @@ public class MemberCreateDto {
     private String phoneNumber;
 
     // @NotNull
+    @Builder.Default
     @Schema(description = "방 입장 여부", defaultValue = "OUT")
     private EnterStatus enterStatus = EnterStatus.OUT;
 
