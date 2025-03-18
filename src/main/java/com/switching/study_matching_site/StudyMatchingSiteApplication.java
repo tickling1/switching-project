@@ -10,7 +10,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @SpringBootApplication
 @EnableJpaAuditing
-@Profile("dev")
 public class StudyMatchingSiteApplication {
 
 	private final MemberService memberService;

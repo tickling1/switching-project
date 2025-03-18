@@ -12,12 +12,14 @@ import jakarta.persistence.EntityManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
+import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
 
 import static com.switching.study_matching_site.domain.QRoom.*;
 
+@Repository
 public class RoomRepositoryImpl implements RoomRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
