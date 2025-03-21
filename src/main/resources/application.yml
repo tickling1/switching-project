@@ -3,7 +3,21 @@ spring:
     name: study-matching-site
 
   profiles:
-    active: dev
+    active: prod
 
   jwt:
     secret: ENC(Sa9wLuzb+ZdcAw6iGxOw67rSdpu2nGv0mOXWqbppluqQjxHmaET/8peDAoAhmZ5POXvotgUL13y3XzeWNi73DA==)
+
+# ${환경변수} 로 숨기기
+jasypt:
+  encryptor:
+    password: encryptTestKey
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui
+  api-docs:
+    path: /v3/api-docs
+
+server:
+  port: 8080  # 기본 포트 (환경별로 덮어쓰기 가능)
