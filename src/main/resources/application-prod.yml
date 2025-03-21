@@ -4,15 +4,15 @@ spring:
     activate:
       on-profile: prod
 
-    #datasource:
-    #url: jdbc:mysql://127.0.0.1:3306/switching?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-    #username: root
-    #password: 1234
-    #driver-class-name: com.mysql.cj.jdbc.Driver
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/switching?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: root
+    password: rltmddn7!
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: create
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
@@ -22,3 +22,6 @@ spring:
 logging.level:
   org.hibernate.SQL: debug
   # org.hibernate.type: trace
+
+server:
+  port: 9090

@@ -14,6 +14,7 @@ import com.switching.study_matching_site.exception.InvalidValueException;
 import com.switching.study_matching_site.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -112,7 +113,7 @@ public class MemberService {
         }
     }
 
-    @Transactional
+    @Profile("dev")
     public void initData() {
         Member member = new Member();
         member.setLoginId("ksw");

@@ -25,11 +25,12 @@ public class StudyMatchingSiteApplication {
 	}
 
 	/**
-	 * 테스트용 데이터 추가
+	 * 개발 환경에서 테스트용 데이터 추가
 	 */
-	@PostConstruct
 	@Profile("dev")
+	@PostConstruct
 	public void init() {
+		System.out.println("Init method executed");
 		memberService.initData(); // 트랜잭션 내에서 실행
 		roomService.initData();
 	}

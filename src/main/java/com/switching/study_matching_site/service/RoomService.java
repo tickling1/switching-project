@@ -8,6 +8,7 @@ import com.switching.study_matching_site.exception.ErrorCode;
 import com.switching.study_matching_site.exception.InvalidValueException;
 import com.switching.study_matching_site.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -88,8 +89,9 @@ public class RoomService {
         }
     }
 
-    public void initData() {
 
+    @Profile("dev")
+    public void initData() {
         for (int i = 0; i < 25; i++) {
             Room room = new Room("테스트 방" + i, RoomStatus.ON, 3, 10,
                     LocalTime.now(), LocalTime.now(), Goal.STUDY, TechSkill.JAVA, 3, Region.SEOUL, OfflineStatus.OFFLINE);
