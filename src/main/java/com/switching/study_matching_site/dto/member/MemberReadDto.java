@@ -1,7 +1,6 @@
 package com.switching.study_matching_site.dto.member;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.switching.study_matching_site.domain.EnterStatus;
 import com.switching.study_matching_site.domain.FriendRequest;
 import com.switching.study_matching_site.domain.Member;
 import com.switching.study_matching_site.domain.Profile;

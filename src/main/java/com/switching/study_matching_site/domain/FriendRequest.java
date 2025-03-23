@@ -1,6 +1,7 @@
 package com.switching.study_matching_site.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.switching.study_matching_site.domain.type.RequestStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,7 +11,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class FriendRequest {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @JsonIgnore

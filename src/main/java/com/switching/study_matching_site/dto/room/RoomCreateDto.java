@@ -1,6 +1,7 @@
 package com.switching.study_matching_site.dto.room;
 
 import com.switching.study_matching_site.domain.*;
+import com.switching.study_matching_site.domain.type.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 

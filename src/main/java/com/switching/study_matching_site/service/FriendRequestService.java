@@ -3,7 +3,7 @@ package com.switching.study_matching_site.service;
 import com.switching.study_matching_site.SecurityUtil;
 import com.switching.study_matching_site.domain.FriendRequest;
 import com.switching.study_matching_site.domain.Member;
-import com.switching.study_matching_site.domain.RequestStatus;
+import com.switching.study_matching_site.domain.type.RequestStatus;
 import com.switching.study_matching_site.dto.friend.FriendsResponse;
 import com.switching.study_matching_site.exception.EntityNotFoundException;
 import com.switching.study_matching_site.exception.ErrorCode;

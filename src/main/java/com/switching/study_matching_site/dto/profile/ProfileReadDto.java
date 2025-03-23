@@ -1,6 +1,10 @@
 package com.switching.study_matching_site.dto.profile;
 
 import com.switching.study_matching_site.domain.*;
+import com.switching.study_matching_site.domain.type.Goal;
+import com.switching.study_matching_site.domain.type.OfflineStatus;
+import com.switching.study_matching_site.domain.type.Region;
+import com.switching.study_matching_site.domain.type.TechSkill;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

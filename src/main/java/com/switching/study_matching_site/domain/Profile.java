@@ -1,5 +1,9 @@
 package com.switching.study_matching_site.domain;
 
+import com.switching.study_matching_site.domain.type.Goal;
+import com.switching.study_matching_site.domain.type.OfflineStatus;
+import com.switching.study_matching_site.domain.type.Region;
+import com.switching.study_matching_site.domain.type.TechSkill;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,7 +17,7 @@ import java.time.LocalTime;
 @Builder
 public class Profile {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "PROFILE_ID")
     private Long id;
 

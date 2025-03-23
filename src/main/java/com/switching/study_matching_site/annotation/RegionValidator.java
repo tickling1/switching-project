@@ -1,6 +1,6 @@
 package com.switching.study_matching_site.annotation;
 
-import com.switching.study_matching_site.domain.Region;
+import com.switching.study_matching_site.domain.type.Region;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

@@ -1,6 +1,7 @@
 package com.switching.study_matching_site.service;
 
 import com.switching.study_matching_site.domain.*;
+import com.switching.study_matching_site.domain.type.*;
 import com.switching.study_matching_site.dto.condition.RoomSearchCond;
 import com.switching.study_matching_site.dto.room.*;
 import com.switching.study_matching_site.exception.EntityNotFoundException;
@@ -18,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @Transactional
