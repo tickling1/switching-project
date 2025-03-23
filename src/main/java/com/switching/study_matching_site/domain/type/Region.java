@@ -1,4 +1,4 @@
-package com.switching.study_matching_site.domain;
+package com.switching.study_matching_site.domain.type;
 
 public enum Region {
     SEOUL,

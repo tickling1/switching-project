@@ -3,7 +3,10 @@ package com.switching.study_matching_site.repository;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.switching.study_matching_site.domain.*;
+import com.switching.study_matching_site.domain.type.Goal;
+import com.switching.study_matching_site.domain.type.OfflineStatus;
+import com.switching.study_matching_site.domain.type.Region;
+import com.switching.study_matching_site.domain.type.TechSkill;
 import com.switching.study_matching_site.dto.condition.RoomSearchCond;
 import com.switching.study_matching_site.dto.matching.ProfileCond;
 import com.switching.study_matching_site.dto.room.QRoomInfoResponseDto;
@@ -13,7 +16,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.StringUtils;
 
 import java.util.List;
 

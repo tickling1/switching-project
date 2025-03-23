@@ -1,10 +1,9 @@
 package com.switching.study_matching_site.service;
 
 import com.switching.study_matching_site.SecurityUtil;
-import com.switching.study_matching_site.domain.EnterStatus;
+import com.switching.study_matching_site.domain.type.EnterStatus;
 import com.switching.study_matching_site.domain.Member;
 import com.switching.study_matching_site.dto.login.LoginRequestDto;
-import com.switching.study_matching_site.dto.member.LoginDto;
 import com.switching.study_matching_site.dto.member.MemberCreateDto;
 import com.switching.study_matching_site.dto.member.MemberReadDto;
 import com.switching.study_matching_site.dto.member.MemberUpdateDto;

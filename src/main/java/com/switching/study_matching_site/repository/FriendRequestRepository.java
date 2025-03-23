@@ -1,8 +1,7 @@
 package com.switching.study_matching_site.repository;
 
 import com.switching.study_matching_site.domain.FriendRequest;
-import com.switching.study_matching_site.domain.Member;
-import com.switching.study_matching_site.domain.RequestStatus;
+import com.switching.study_matching_site.domain.type.RequestStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

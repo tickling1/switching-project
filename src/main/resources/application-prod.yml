@@ -5,7 +5,7 @@ spring:
       on-profile: prod
 
   datasource:
-    url: ENC(yhBPOVyxa8HqITOkczZUVY4UVNhMRxIcq/ut3e58srd/eF7ObPS+iuvvPnIg54NcGtlGx2ECLcc1Q1B9Du2YYW8kHcjmayp1E+2w4ALAjr6SaF7yn07QWLDrvIwpsdRZnF5nhFUhsCXdmJXlQtWU7hzeiT3AdGjIbrkobnUtbRIl6QwF0dWWG7E1sE44g5A4N5ptqGxg/LrUYqOxmr3AfA==)
+    url: jdbc:mysql://testdb-mysql.c5yukwwo40ez.ap-northeast-2.rds.amazonaws.com:3306/switching
     username: root
     password: ENC(ML7LDK3JNhuxprFonh6cJCz9kGRRuRK4)
     driver-class-name: com.mysql.cj.jdbc.Driver

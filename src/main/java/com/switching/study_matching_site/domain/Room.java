@@ -1,7 +1,7 @@
 package com.switching.study_matching_site.domain;
 
+import com.switching.study_matching_site.domain.type.*;
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 

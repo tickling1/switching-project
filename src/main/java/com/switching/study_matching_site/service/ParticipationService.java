@@ -2,11 +2,12 @@ package com.switching.study_matching_site.service;
 
 import com.switching.study_matching_site.SecurityUtil;
 import com.switching.study_matching_site.domain.*;
+import com.switching.study_matching_site.domain.type.EnterStatus;
+import com.switching.study_matching_site.domain.type.RoleType;
 import com.switching.study_matching_site.dto.room.RoomCreateDto;
 import com.switching.study_matching_site.exception.EntityNotFoundException;
 import com.switching.study_matching_site.exception.ErrorCode;
 import com.switching.study_matching_site.exception.InvalidValueException;
-import com.switching.study_matching_site.repository.MemberRepository;
 import com.switching.study_matching_site.repository.ParticipationRepository;
 import com.switching.study_matching_site.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
