@@ -1,9 +1,7 @@
 package com.switching.study_matching_site.dto.member;
 
-import com.switching.study_matching_site.domain.EnterStatus;
-import com.switching.study_matching_site.domain.FriendRequest;
+import com.switching.study_matching_site.domain.type.EnterStatus;
 import com.switching.study_matching_site.domain.Member;
-import com.switching.study_matching_site.domain.Profile;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
@@ -12,8 +10,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * DTO는 불변객체로 만들면 전달 과정 중에서의 데이터 불변성 보장
@@ -92,6 +88,7 @@ public class MemberCreateDto {
     private String phoneNumber;
 
     // @NotNull
+    @Builder.Default
     @Schema(description = "방 입장 여부", defaultValue = "OUT")
     private EnterStatus enterStatus = EnterStatus.OUT;
 

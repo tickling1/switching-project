@@ -1,5 +1,7 @@
 package com.switching.study_matching_site.domain;
 
+import com.switching.study_matching_site.domain.type.EnterStatus;
+import com.switching.study_matching_site.domain.type.RequestStatus;
 import jakarta.persistence.*;
 import lombok.*;
 

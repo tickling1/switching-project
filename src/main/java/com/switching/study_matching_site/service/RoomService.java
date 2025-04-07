@@ -1,6 +1,7 @@
 package com.switching.study_matching_site.service;
 
 import com.switching.study_matching_site.domain.*;
+import com.switching.study_matching_site.domain.type.*;
 import com.switching.study_matching_site.dto.condition.RoomSearchCond;
 import com.switching.study_matching_site.dto.room.*;
 import com.switching.study_matching_site.exception.EntityNotFoundException;
@@ -8,6 +9,7 @@ import com.switching.study_matching_site.exception.ErrorCode;
 import com.switching.study_matching_site.exception.InvalidValueException;
 import com.switching.study_matching_site.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -17,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @Transactional
@@ -88,8 +89,9 @@ public class RoomService {
         }
     }
 
-    public void initData() {
 
+    @Profile("dev")
+    public void initData() {
         for (int i = 0; i < 25; i++) {
             Room room = new Room("테스트 방" + i, RoomStatus.ON, 3, 10,
                     LocalTime.now(), LocalTime.now(), Goal.STUDY, TechSkill.JAVA, 3, Region.SEOUL, OfflineStatus.OFFLINE);

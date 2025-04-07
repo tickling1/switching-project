@@ -1,9 +1,9 @@
 package com.switching.study_matching_site.dto.condition;
 
-import com.switching.study_matching_site.domain.Goal;
-import com.switching.study_matching_site.domain.OfflineStatus;
-import com.switching.study_matching_site.domain.Region;
-import com.switching.study_matching_site.domain.TechSkill;
+import com.switching.study_matching_site.domain.type.Goal;
+import com.switching.study_matching_site.domain.type.OfflineStatus;
+import com.switching.study_matching_site.domain.type.Region;
+import com.switching.study_matching_site.domain.type.TechSkill;
 import lombok.Getter;
 import lombok.Setter;
 

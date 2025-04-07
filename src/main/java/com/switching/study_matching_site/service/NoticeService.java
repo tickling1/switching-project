@@ -2,10 +2,9 @@ package com.switching.study_matching_site.service;
 
 import com.switching.study_matching_site.SecurityUtil;
 import com.switching.study_matching_site.domain.*;
-import com.switching.study_matching_site.dto.member.CustomUserDetails;
+import com.switching.study_matching_site.domain.type.RoleType;
 import com.switching.study_matching_site.dto.notice.NoticeCreate;
 import com.switching.study_matching_site.dto.notice.NoticeRead;
-import com.switching.study_matching_site.dto.notice.NoticeUpdate;
 import com.switching.study_matching_site.exception.EntityNotFoundException;
 import com.switching.study_matching_site.exception.ErrorCode;
 import com.switching.study_matching_site.exception.InvalidValueException;
@@ -13,7 +12,6 @@ import com.switching.study_matching_site.repository.NoticeRepository;
 import com.switching.study_matching_site.repository.ParticipationRepository;
 import com.switching.study_matching_site.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

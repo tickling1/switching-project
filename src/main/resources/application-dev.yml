@@ -15,21 +15,9 @@ spring:
       ddl-auto: create
     properties:
       hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
         # show_sql: true
         format_sql: true
-        dialect: org.hibernate.dialect.H2Dialect
 
-# ${환경변수} 로 숨기기
-jasypt:
-  encryptor:
-    password: encryptTestKey
-
-logging.level:
-  org.hibernate.SQL: debug
-  # org.hibernate.type: trace
-
-springdoc:
-  swagger-ui:
-    path: /swagger-ui
-  api-docs:
-    path: /v3/api-docs
+server:
+  port: 8081

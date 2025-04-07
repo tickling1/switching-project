@@ -1,7 +1,7 @@
 package com.switching.study_matching_site.repository;
 
-import com.switching.study_matching_site.StudyMatchingSiteApplication;
 import com.switching.study_matching_site.domain.*;
+import com.switching.study_matching_site.domain.type.*;
 import com.switching.study_matching_site.dto.condition.RoomSearchCond;
 import com.switching.study_matching_site.dto.room.RoomInfoResponseDto;
 import jakarta.persistence.EntityManager;
@@ -10,14 +10,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalTime;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-@SpringBootTest(classes = StudyMatchingSiteApplication.class)
+@SpringBootTest
+@ActiveProfiles("test")
 @Transactional
 class RoomRepositoryImplTest {
 
