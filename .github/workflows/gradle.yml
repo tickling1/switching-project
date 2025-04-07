@@ -20,6 +20,9 @@ jobs:
           distribution: 'temurin' # OpenJDK 배포판 중 하나인 Temurin 사용
           java-version: '17'      # Java 17 버전 설치
 
+      - name: Give gradlew permission
+        run: chmod +x ./gradlew
+
       - name: Build with Gradle
         run: ./gradlew clean build
         # Gradle 빌드 실행 (clean: 기존 빌드 파일 삭제, build: 새로 빌드 생성)
