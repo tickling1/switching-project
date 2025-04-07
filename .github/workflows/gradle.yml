@@ -28,6 +28,10 @@ jobs:
         # Gradle 빌드 실행 (clean: 기존 빌드 파일 삭제, build: 새로 빌드 생성)
         # 결과물은 보통 build/libs 디렉토리에 생성됨
 
+      - name: Rename jar for deployment
+        run: mv build/libs/*.jar build/libs/app.jar
+        # S3에 업로드할 때 파일명을 고정하기
+
       - name: Upload jar to S3
         uses: jakejarvis/s3-sync-action@master
         with:
