@@ -6,12 +6,7 @@ spring:
     active: prod
 
   jwt:
-    secret: ENC(Sa9wLuzb+ZdcAw6iGxOw67rSdpu2nGv0mOXWqbppluqQjxHmaET/8peDAoAhmZ5POXvotgUL13y3XzeWNi73DA==)
-
-# ${환경변수} 로 숨기기
-jasypt:
-  encryptor:
-    password: encryptTestKey
+    secret: ${spring.jwt.secret}
 
 springdoc:
   swagger-ui:
