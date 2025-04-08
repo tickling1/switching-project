@@ -3,11 +3,13 @@ spring:
   config:
     activate:
       on-profile: prod
+    #이름의 secret을 AWS Secrets Manager에서 자동으로 불러옴
+    import: aws-secretsmanager:${spring.profiles.active}/switching
 
   datasource:
-    url: jdbc:mysql://testdb-mysql.c5yukwwo40ez.ap-northeast-2.rds.amazonaws.com:3306/switching
-    username: root
-    password: ENC(ML7LDK3JNhuxprFonh6cJCz9kGRRuRK4)
+    url: ${spring.datasource.url}
+    username: ${spring.datasource.username}
+    password: ${spring.datasource.password}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -22,6 +24,10 @@ spring:
 logging.level:
   org.hibernate.SQL: debug
   # org.hibernate.type: trace
+
+custom:
+  secret:
+    name: prod/switching
 
 server:
   port: 9090

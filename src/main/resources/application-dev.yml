@@ -5,9 +5,8 @@ spring:
       on-profile: dev
 
   datasource:
-    url: ENC(IxWZd7iLU/V9qi8AT63ALcmAhRWD3TKqOQQPv0wNRtltexkp0AWaRCyvZ1CwG9tWck0qdRO1WRs=)
-    username: ENC(02RRfWWBpyqVy0Sp725Oyg==)
-    password:
+    url: "jdbc:h2:tcp://localhost/~/dev/switching-project"
+    username: "sa"
     driver-class-name: org.h2.Driver
 
   jpa:
@@ -18,6 +17,11 @@ spring:
         dialect: org.hibernate.dialect.H2Dialect
         # show_sql: true
         format_sql: true
+
+
+custom:
+  secret:
+    name: dev/switching
 
 server:
   port: 8081

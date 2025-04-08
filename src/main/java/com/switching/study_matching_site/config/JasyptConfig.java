@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/*
 @Configuration
 @EnableEncryptableProperties
 public class JasyptConfig {
@@ -29,3 +30,4 @@ public class JasyptConfig {
         return encryptor;
     }
 }
+*/
