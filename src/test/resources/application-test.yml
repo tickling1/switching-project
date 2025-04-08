@@ -8,6 +8,9 @@ spring:
     username: sa
     password:
 
+  jwt:
+    secret: "sadsadwqdsadsads"
+
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
@@ -17,10 +20,9 @@ spring:
         format_sql: true
         # show_sql: true
 
-# ${환경변수} 로 숨기기
-jasypt:
-  encryptor:
-    password: encryptTestKey
+custom:
+  secret:
+    name: prod/switching
 
 logging.level:
   org.hibernate.SQL: debug
