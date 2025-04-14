@@ -2,59 +2,57 @@ name: Deploy Spring Boot to AWS
 
 on:
   push:
-    branches: [ main ]  # main 브랜치에 push 될 때마다 실행됨
+    branches: [ main ]  # main 브랜치에 push 될 때만 실행
 
 jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest  # 최신 우분투 가상환경에서 실행
+  build-and-upload:
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
-        # GitHub 저장소의 코드를 체크아웃해서 로컬 환경에 복사
+        uses: actions/checkout@v4  # GitHub repo의 소스 코드 가져오기
 
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          distribution: 'temurin'  # OpenJDK의 Temurin 배포판 사용
-          java-version: '17'       # Java 17 설치
-        # Java 기반의 Spring Boot 프로젝트를 빌드하기 위한 환경 구성
+          distribution: 'temurin'
+          java-version: '17'
 
-      - name: Give gradlew permission
+      - name: Grant execute permission to Gradle wrapper
         run: chmod +x ./gradlew
-        # gradlew 실행 권한 부여 (Unix 시스템에서는 필수)
 
       - name: Build with Gradle
-        run: ./gradlew clean build
-        # 프로젝트를 빌드. 결과물(JAR 파일)은 build/libs/ 에 생성됨
+        run: ./gradlew clean build  # 프로젝트 빌드
 
-      - name: Rename jar for deployment
-        run: mv build/libs/*.jar build/libs/app.jar
-        # 결과 JAR 파일 이름을 app.jar로 통일하여 관리하기 쉽게 함
+      - name: Rename JAR for deployment
+        run: mv build/libs/*.jar build/libs/app.jar  # app.jar로 고정 (CodeDeploy에서 사용하기 쉽게)
 
-      - name: Create deploy-package directory
-        run: mkdir -p deploy-package
-        # CodeDeploy에서 사용할 배포 패키지 폴더 생성
-
-      - name: Copy deploy files to deploy-package
+      - name: Prepare deploy package
         run: |
+          mkdir -p deploy-package
           cp build/libs/app.jar deploy-package/
           cp appspec.yml deploy-package/
           cp deploy.sh deploy-package/
-        # JAR, appspec.yml, deploy.sh 파일을 배포 패키지로 복사
 
-      - name: Zip deploy package
-        run: zip -r deploy.zip deploy-package
-        # 전체 배포 패키지를 하나의 ZIP 파일로 압축 (CodeDeploy는 zip 파일을 사용)
+      - name: Zip the deploy package
+        run: |
+          cd deploy-package
+          zip -r deploy.zip .  # deploy.zip 생성
 
+      # AWS CLI 설치
+      - name: Install AWS CLI
+        run: |
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip
+          sudo ./aws/install
+
+      # AWS 자격 증명 설정 (Secrets에 저장된 값 사용)
+      - name: Configure AWS credentials
+        run: |
+          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws configure set default.region ${{ secrets.AWS_REGION }}
+
+      # S3에 deploy.zip 업로드
       - name: Upload to S3
-        uses: aws-actions/s3-upload@v1
-        with:
-          bucket: switching-bucket-202504                # S3 버킷 이름
-          source: deploy.zip                             # 로컬의 zip 파일
-          destination: latest/deploy.zip                 # S3에서 저장될 경로
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}         # GitHub Secrets에 저장된 AWS 키
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }} # GitHub Secrets에 저장된 AWS 비밀 키
-          AWS_REGION: ap-northeast-2                                 # S3가 있는 리전 (서울)
-
+        run: aws s3 cp deploy-package/deploy.zip s3://switching-bucket-202504/app.zip
