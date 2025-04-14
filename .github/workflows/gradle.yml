@@ -39,13 +39,6 @@ jobs:
           cd deploy-package
           zip -r deploy.zip .  # deploy.zip 생성
 
-      # AWS CLI 설치
-      - name: Install AWS CLI
-        run: |
-          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-          unzip awscliv2.zip
-          sudo ./aws/install
-
       # AWS 자격 증명 설정 (Secrets에 저장된 값 사용)
       - name: Configure AWS credentials
         run: |
