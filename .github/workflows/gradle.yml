@@ -27,19 +27,26 @@ jobs:
       - name: Rename jar for deployment
         run: mv build/libs/*.jar build/libs/app.jar
 
-      - name: Copy deploy files to root
+      - name: Zip deploy package
         run: |
-          cp build/libs/app.jar ./
-          cp start.sh ./
-          cp clean-up.sh ./
-          cp appspec.yml ./
-
-      - name: Zip deployment package
-        run: zip -r app.zip app.jar start.sh clean-up.sh appspec.yml
+          zip -r app.zip appspec.yml start.sh clean-up.sh build/libs/app.jar
 
       - name: Upload to S3
         run: aws s3 cp app.zip s3://switching-bucket-202504/app.zip
         env:
+          AWS_S3_BUCKET: ${{ secrets.S3_BUCKET_NAME }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: ap-northeast-2
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+
+      - name: Trigger CodeDeploy deployment
+        run: |
+          aws deploy create-deployment \
+            --application-name "switching-ec2-app" \
+            --deployment-group-name "switching-deploy-group" \
+            --revision "revisionType=S3,s3Location={bucket=switching-bucket-202504,key=app.zip,bundleType=zip}" \
+            --deployment-config-name "CodeDeployDefault.AllAtOnce"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
