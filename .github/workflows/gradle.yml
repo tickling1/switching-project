@@ -38,8 +38,8 @@ jobs:
       - name: Copy deploy files to deploy-package  # deploy-package에 파일 복사
         run: |
           cp appspec.yml deploy-package/        # 루트에서 appspec.yml 복사
-          cp scripts/clean-up.sh deploy-package/  # scripts 폴더에서 clean-up.sh 복사
-          cp scripts/start.sh deploy-package/    # scripts 폴더에서 start.sh 복사
+          cp clean-up.sh deploy-package/  # scripts 폴더에서 clean-up.sh 복사
+          cp start.sh deploy-package/    # scripts 폴더에서 start.sh 복사
           cp build/libs/app.jar deploy-package/  # 빌드된 app.jar 복사
 
       - name: Zip deploy package
