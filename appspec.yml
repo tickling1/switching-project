@@ -7,8 +7,12 @@ permissions:
   - object: /home/ubuntu/app/deploy
     owner: ubuntu
     group: ubuntu
+
 hooks:
+  BeforeInstall:
+    - location: scripts/clean-up.sh  # clean-up.sh 파일 경로
+      timeout: 180
+
   AfterInstall:
-    - location: deploy.sh
-      timeout: 60
-      runas: ubuntu
+    - location: scripts/start.sh  # 기존 start.sh 파일 경로
+      timeout: 180
