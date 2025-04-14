@@ -57,11 +57,12 @@ jobs:
 
       - name: Trigger CodeDeploy Deployment  # AWS CodeDeploy 배포 트리거
         run: |
-          aws deploy create-deployment \  # 배포를 트리거하는 AWS CLI 명령어
-            --application-name switching-ec2-app \  # CodeDeploy 애플리케이션 이름
-            --deployment-group-name switching-deploy-group \  # 배포 그룹 이름
-            --revision revisionType=S3,s3Location={bucket=${{ secrets.S3_BUCKET_NAME }},key=app.zip,bundleType=zip} \  # S3 위치와 배포 파일 설정
-            --deployment-config-name CodeDeployDefault.OneAtATime \  # 하나씩 배포하는 기본 설정
-            --region ${{ secrets.AWS_REGION }} \  # 리전 정보
-            --no-wait  # 배포 완료까지 기다리지 않고 즉시 종료 (백그라운드에서 진행)
+          aws deploy create-deployment \
+            --application-name "switching-ec2-app" \  # CodeDeploy 애플리케이션 이름
+            --deployment-group-name "switching-deploy-group" \  # 배포 그룹 이름
+            --revision "revisionType=S3,s3Location={bucket=switching-bucket-202504,key=app.zip,bundleType=zip}" \
+            --deployment-config-name "CodeDeployDefault.AllAtOnce"  # 배포 설정 (모든 인스턴스에 한 번에 배포)
+
+
+
 
