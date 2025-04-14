@@ -1,68 +1,68 @@
-name: Deploy Spring Boot to AWS  # 워크플로우 이름 설정
+name: Deploy Spring Boot to AWS
 
-# main 브랜치에 push가 발생할 때마다 이 워크플로우가 실행됩니다.
 on:
   push:
-    branches: [ main ]  # main 브랜치에 변경 사항이 있을 때 실행
+    branches: [ main ]  # main 브랜치에 push 될 때마다 이 워크플로우가 실행됨
 
 jobs:
-  build-and-upload:  # 작업 이름 설정 (이 작업은 빌드 후 S3에 업로드하는 역할)
-
-    runs-on: ubuntu-latest  # GitHub에서 제공하는 최신 Ubuntu 환경에서 실행
+  build-and-upload:
+    runs-on: ubuntu-latest  # GitHub에서 제공하는 최신 Ubuntu 가상환경에서 실행
 
     steps:
-      - name: Checkout code  # 코드 체크아웃
+      - name: Checkout code
         uses: actions/checkout@v4
-        # GitHub 리포지토리의 코드를 현재 워크플로우 환경에 다운로드
+        # 현재 리포지토리의 코드를 체크아웃 (가져오기) 해서 다음 단계에서 사용할 수 있게 함
 
-      - name: Set up JDK  # Java 환경 설정
+      - name: Set up JDK
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'  # OpenJDK 배포판 중 하나인 Temurin 사용
           java-version: '17'       # Java 17 버전 설치
 
-      - name: Give gradlew permission  # gradlew 실행 권한 부여
+      - name: Give gradlew permission
         run: chmod +x ./gradlew
-        # 프로젝트 내 gradlew 파일에 실행 권한을 부여합니다.
 
-      - name: Build with Gradle  # Gradle 빌드 실행
+      - name: Build with Gradle
         run: ./gradlew clean build
-        # clean: 기존 빌드를 삭제하고, build: 새로 빌드를 생성
+        # Gradle 빌드 실행 (clean: 기존 빌드 파일 삭제, build: 새로 빌드 생성)
+        # 결과물은 보통 build/libs 디렉토리에 생성됨
 
-      - name: Rename jar for deployment  # 빌드된 jar 파일 이름 변경
+      - name: Rename jar for deployment
         run: mv build/libs/*.jar build/libs/app.jar
-        # 빌드된 JAR 파일 이름을 고정하여 S3에 업로드할 때 동일한 이름으로 사용
+        # S3에 업로드할 때 파일명을 고정하기
 
       - name: Create deploy-package directory  # 배포 디렉토리 생성
         run: mkdir -p deploy-package
-        # 배포 파일들을 저장할 디렉토리 생성
+        # CodeDeploy용 디렉토리 생성
 
-      - name: Copy deploy files to deploy-package  # 배포 파일들 복사
+      - name: Copy deploy files to deploy-package  # deploy-package에 파일 복사
         run: |
-          cp appspec.yml deploy-package/        # appspec.yml 복사
-          cp deploy.sh deploy-package/          # deploy.sh 복사
+          cp appspec.yml deploy-package/        # 루트에서 appspec.yml 복사
+          cp deploy.sh deploy-package/          # 루트에서 deploy.sh 복사
           cp build/libs/app.jar deploy-package/  # 빌드된 app.jar 복사
 
-      - name: Upload deploy package to S3  # S3에 배포 파일 업로드
+      - name: Upload deploy package to S3
         uses: jakejarvis/s3-sync-action@master
         with:
-          args: --acl private --follow-symlinks  # --acl private: S3에 비공개로 업로드
+          args: --acl private --follow-symlinks
+          # --acl private: S3 객체를 비공개로 업로드
           # --follow-symlinks: 심볼릭 링크도 따라가서 업로드
         env:
-          AWS_S3_BUCKET: ${{ secrets.S3_BUCKET_NAME }}  # S3 버킷 이름 (GitHub Secrets에서 설정)
+          AWS_S3_BUCKET: ${{ secrets.S3_BUCKET_NAME }}  # S3 버킷 이름
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}  # AWS IAM 액세스 키
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}  # AWS IAM 비밀 키
+          AWS_REGION: ${{ secrets.AWS_REGION }}  # S3 버킷이 있는 AWS 리전
+          SOURCE_DIR: deploy-package  # S3에 업로드할 디렉토리
+
+      - name: Trigger CodeDeploy deployment
+        run: |
+          aws deploy create-deployment \
+            --application-name "switching-ec2-app" \
+            --deployment-group-name "switching-deploy-group" \
+            --revision "revisionType=S3,s3Location={bucket=switching-bucket-202504,key=app.zip,bundleType=zip}" \
+            --deployment-config-name "CodeDeployDefault.AllAtOnce"
+        env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}  # AWS IAM 액세스 키
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}  # AWS IAM 비밀 키
           AWS_REGION: ${{ secrets.AWS_REGION }}  # AWS 리전
-          SOURCE_DIR: deploy-package  # 배포 파일을 포함한 디렉토리
-
-      - name: Trigger CodeDeploy Deployment  # AWS CodeDeploy 배포 트리거
-        run: |
-          aws deploy create-deployment \
-            --application-name "switching-ec2-app" \  # CodeDeploy 애플리케이션 이름
-            --deployment-group-name "switching-deploy-group" \  # 배포 그룹 이름
-            --revision "revisionType=S3,s3Location={bucket=switching-bucket-202504,key=app.zip,bundleType=zip}" \
-            --deployment-config-name "CodeDeployDefault.AllAtOnce"  # 배포 설정 (모든 인스턴스에 한 번에 배포)
-
-
-
 
