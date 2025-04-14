@@ -1,51 +1,67 @@
-name: Deploy Spring Boot to AWS
+name: Deploy Spring Boot to AWS  # 워크플로우 이름 설정
 
+# main 브랜치에 push가 발생할 때마다 이 워크플로우가 실행됩니다.
 on:
   push:
-    branches: [ main ]  # main 브랜치에 push 될 때만 실행
+    branches: [ main ]  # main 브랜치에 변경 사항이 있을 때 실행
 
 jobs:
-  build-and-upload:
-    runs-on: ubuntu-latest
+  build-and-upload:  # 작업 이름 설정 (이 작업은 빌드 후 S3에 업로드하는 역할)
+
+    runs-on: ubuntu-latest  # GitHub에서 제공하는 최신 Ubuntu 환경에서 실행
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4  # GitHub repo의 소스 코드 가져오기
+      - name: Checkout code  # 코드 체크아웃
+        uses: actions/checkout@v4
+        # GitHub 리포지토리의 코드를 현재 워크플로우 환경에 다운로드
 
-      - name: Set up JDK
+      - name: Set up JDK  # Java 환경 설정
         uses: actions/setup-java@v3
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          distribution: 'temurin'  # OpenJDK 배포판 중 하나인 Temurin 사용
+          java-version: '17'       # Java 17 버전 설치
 
-      - name: Grant execute permission to Gradle wrapper
+      - name: Give gradlew permission  # gradlew 실행 권한 부여
         run: chmod +x ./gradlew
+        # 프로젝트 내 gradlew 파일에 실행 권한을 부여합니다.
 
-      - name: Build with Gradle
-        run: ./gradlew clean build  # 프로젝트 빌드
+      - name: Build with Gradle  # Gradle 빌드 실행
+        run: ./gradlew clean build
+        # clean: 기존 빌드를 삭제하고, build: 새로 빌드를 생성
 
-      - name: Rename JAR for deployment
-        run: mv build/libs/*.jar build/libs/app.jar  # app.jar로 고정 (CodeDeploy에서 사용하기 쉽게)
+      - name: Rename jar for deployment  # 빌드된 jar 파일 이름 변경
+        run: mv build/libs/*.jar build/libs/app.jar
+        # 빌드된 JAR 파일 이름을 고정하여 S3에 업로드할 때 동일한 이름으로 사용
 
-      - name: Prepare deploy package
+      - name: Create deploy-package directory  # 배포 디렉토리 생성
+        run: mkdir -p deploy-package
+        # 배포 파일들을 저장할 디렉토리 생성
+
+      - name: Copy deploy files to deploy-package  # 배포 파일들 복사
         run: |
-          mkdir -p deploy-package
-          cp build/libs/app.jar deploy-package/
-          cp appspec.yml deploy-package/
-          cp deploy.sh deploy-package/
+          cp appspec.yml deploy-package/        # appspec.yml 복사
+          cp deploy.sh deploy-package/          # deploy.sh 복사
+          cp build/libs/app.jar deploy-package/  # 빌드된 app.jar 복사
 
-      - name: Zip the deploy package
+      - name: Upload deploy package to S3  # S3에 배포 파일 업로드
+        uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --acl private --follow-symlinks  # --acl private: S3에 비공개로 업로드
+          # --follow-symlinks: 심볼릭 링크도 따라가서 업로드
+        env:
+          AWS_S3_BUCKET: ${{ secrets.S3_BUCKET_NAME }}  # S3 버킷 이름 (GitHub Secrets에서 설정)
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}  # AWS IAM 액세스 키
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}  # AWS IAM 비밀 키
+          AWS_REGION: ${{ secrets.AWS_REGION }}  # AWS 리전
+          SOURCE_DIR: deploy-package  # 배포 파일을 포함한 디렉토리
+
+      - name: Trigger CodeDeploy Deployment  # AWS CodeDeploy 배포 트리거
         run: |
-          cd deploy-package
-          zip -r deploy.zip .  # deploy.zip 생성
+          aws deploy create-deployment \  # 배포를 트리거하는 AWS CLI 명령어
+            --application-name switching-ec2-app \  # CodeDeploy 애플리케이션 이름
+            --deployment-group-name switching-deploy-group \  # 배포 그룹 이름
+            --revision revisionType=S3,s3Location={bucket=${{ secrets.S3_BUCKET_NAME }},key=app.zip,bundleType=zip} \  # S3 위치와 배포 파일 설정
+            --deployment-config-name CodeDeployDefault.OneAtATime \  # 하나씩 배포하는 기본 설정
+            --region ${{ secrets.AWS_REGION }} \  # 리전 정보
+            --no-wait  # 배포 완료까지 기다리지 않고 즉시 종료 (백그라운드에서 진행)
 
-      # AWS 자격 증명 설정 (Secrets에 저장된 값 사용)
-      - name: Configure AWS credentials
-        run: |
-          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws configure set default.region ${{ secrets.AWS_REGION }}
-
-      # S3에 deploy.zip 업로드
-      - name: Upload to S3
-        run: aws s3 cp deploy-package/deploy.zip s3://switching-bucket-202504/app.zip
