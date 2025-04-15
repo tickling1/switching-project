@@ -27,21 +27,23 @@ jobs:
       - name: Rename jar for deployment
         run: mv build/libs/*.jar build/libs/app.jar
 
-      - name: Copy deploy files to deploy-package
+      - name: Prepare deploy-package directory
         run: |
+          rm -rf deploy-package
+          mkdir -p deploy-package
           cp appspec.yml deploy-package/
           cp start.sh deploy-package/
           cp clean-up.sh deploy-package/
-          cp build/libs/app.jar deploy-package/  # <- 이거 중요!
+          cp build/libs/app.jar deploy-package/
 
       - name: Zip for deployment
-        run: zip -r app.zip *  # 또는 zip -r app.zip ./* (deploy-package 내부에서)
-        working-directory: deploy-package
+        run: |
+          cd deploy-package
+          zip -r ../app.zip ./*
 
       - name: Upload to S3
         run: aws s3 cp app.zip s3://switching-bucket-202504/app.zip
         env:
-          AWS_S3_BUCKET: ${{ secrets.S3_BUCKET_NAME }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
@@ -51,8 +53,10 @@ jobs:
           aws deploy create-deployment \
             --application-name "switching-ec2-app" \
             --deployment-group-name "switching-deploy-group" \
-            --revision "revisionType=S3,s3Location={bucket=switching-bucket-202504,key=app.zip,bundleType=zip}" \
-            --deployment-config-name "CodeDeployDefault.AllAtOnce"
+            --revision type=S3,bucket=switching-bucket-202504,key=app.zip \
+            --deployment-config-name CodeDeployDefault.AllAtOnce \
+            --description "Deploy triggered by GitHub Actions" \
+            --region ${{ secrets.AWS_REGION }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
