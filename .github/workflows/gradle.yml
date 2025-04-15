@@ -44,6 +44,7 @@ jobs:
       - name: Upload to S3
         run: aws s3 cp app.zip s3://switching-bucket-202504/app.zip
         env:
+          AWS_S3_BUCKET: ${{ secrets.S3_BUCKET_NAME }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
@@ -53,10 +54,8 @@ jobs:
           aws deploy create-deployment \
             --application-name "switching-ec2-app" \
             --deployment-group-name "switching-deploy-group" \
-            --revision type=S3,bucket=switching-bucket-202504,key=app.zip \
-            --deployment-config-name CodeDeployDefault.AllAtOnce \
-            --description "Deploy triggered by GitHub Actions" \
-            --region ${{ secrets.AWS_REGION }}
+            --revision "revisionType=S3,s3Location={bucket=switching-bucket-202504,key=app.zip,bundleType=zip}" \
+            --deployment-config-name "CodeDeployDefault.AllAtOnce"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
