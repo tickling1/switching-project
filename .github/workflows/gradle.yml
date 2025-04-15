@@ -27,9 +27,16 @@ jobs:
       - name: Rename jar for deployment
         run: mv build/libs/*.jar build/libs/app.jar
 
-      - name: Zip deploy package
+      - name: Copy deploy files to deploy-package
         run: |
-          zip -r app.zip appspec.yml start.sh clean-up.sh build/libs/app.jar
+          cp appspec.yml deploy-package/
+          cp start.sh deploy-package/
+          cp clean-up.sh deploy-package/
+          cp build/libs/app.jar deploy-package/  # <- 이거 중요!
+
+      - name: Zip for deployment
+        run: zip -r app.zip *  # 또는 zip -r app.zip ./* (deploy-package 내부에서)
+        working-directory: deploy-package
 
       - name: Upload to S3
         run: aws s3 cp app.zip s3://switching-bucket-202504/app.zip
