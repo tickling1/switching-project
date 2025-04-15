@@ -38,7 +38,10 @@ public class JWTFilter extends OncePerRequestFilter {
         // 로그인, 회원가입, 토큰 재발급 경로는 JWT 필터를 거치지 않도록 설정
         if (requestURI.equals("/login") ||
                 requestURI.equals("/members") ||
-                requestURI.equals("/reissue")) {
+                requestURI.equals("/reissue") ||
+                requestURI.startsWith("/swagger-ui") ||
+                requestURI.startsWith("/v3/api-docs") ||
+                requestURI.startsWith("/swagger-resources")) {
             filterChain.doFilter(request, response);
             return;
         }
