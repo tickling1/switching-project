@@ -17,7 +17,7 @@ PORT_B=9091
 # -----------------------
 # 배포 파일 다운로드
 # -----------------------
-echo "⬇️ S3에서 최신 배포 파일 다운로드"
+echo "⬇️ S3에서 최신 배포 파일 다운로드 !"
 aws s3 cp s3://$S3_BUCKET/$S3_KEY $DEPLOY_PATH/app.zip
 if [ $? -ne 0 ]; then
   echo "❗ ZIP 파일 다운로드 실패: $S3_BUCKET/$S3_KEY"
