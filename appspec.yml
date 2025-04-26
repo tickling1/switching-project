@@ -11,9 +11,9 @@ permissions:
 
 hooks:
   BeforeInstall:
-    - location: deploy/clean-up.sh  # deploy 폴더 안에 있는 걸로 고쳐야 함
+    - location: clean-up.sh
       timeout: 180
 
   AfterInstall:
-    - location: deploy/start.sh     # 이것도 deploy/start.sh로
+    - location: start.sh
       timeout: 180
