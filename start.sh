@@ -38,12 +38,6 @@ if [ $? -ne 0 ]; then
 fi
 
 # -----------------------
-# start.sh 권한 부여 (지금 시점에!)
-# -----------------------
-chmod +x $DEPLOY_PATH/start.sh
-echo "✅ start.sh permission granted!"
-
-# -----------------------
 # 현재 실행 중인 포트 확인
 # -----------------------
 echo "🔍 Checking current running port..."
