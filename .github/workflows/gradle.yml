@@ -36,6 +36,9 @@ jobs:
           cp clean-up.sh deploy-package/
           cp build/libs/app.jar deploy-package/
 
+      - name: Give execution permission to scripts
+        run: chmod +x deploy-package/start.sh deploy-package/clean-up.sh
+
       - name: Zip for deployment
         run: |
           cd deploy-package
