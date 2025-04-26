@@ -31,3 +31,5 @@ custom:
 
 server:
   port: 9090
+  shutdown: graceful
+
