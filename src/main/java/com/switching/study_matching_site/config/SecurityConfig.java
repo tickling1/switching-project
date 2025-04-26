@@ -79,7 +79,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**",
                                 "/login","/reissue", "/rooms/**", "/rooms",
-                                "/", "/members").permitAll()// 해당 경로에서는 모든 권한를 허용함
+                                "/", "/members", "/actuator/health").permitAll()// 해당 경로에서는 모든 권한를 허용함
                         .anyRequest().authenticated()); // 나머지 요청에서는 로그인한 사람만 들어갈 수 있음.
 
 

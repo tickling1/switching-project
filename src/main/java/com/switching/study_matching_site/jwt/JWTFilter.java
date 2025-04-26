@@ -42,7 +42,8 @@ public class JWTFilter extends OncePerRequestFilter {
                 requestURI.startsWith("/swagger-ui") ||
                 requestURI.startsWith("/v3/api-docs") ||
                 requestURI.startsWith("/swagger-resources") ||
-                requestURI.startsWith("/rooms")) {
+                requestURI.startsWith("/rooms") ||
+                requestURI.startsWith("/actuator/health")){
             filterChain.doFilter(request, response);
             return;
         }
