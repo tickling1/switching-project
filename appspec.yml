@@ -3,6 +3,7 @@ os: linux
 files:
   - source: .
     destination: /home/ubuntu/app/deploy
+
 permissions:
   - object: /home/ubuntu/app/deploy
     owner: ubuntu
@@ -10,9 +11,9 @@ permissions:
 
 hooks:
   BeforeInstall:
-    - location: clean-up.sh  # 루트 폴더에서 clean-up.sh 실행
+    - location: deploy/clean-up.sh  # deploy 폴더 안에 있는 걸로 고쳐야 함
       timeout: 180
 
   AfterInstall:
-    - location: start.sh   # 루트 폴더에서 start.sh 실행
+    - location: deploy/start.sh     # 이것도 deploy/start.sh로
       timeout: 180
