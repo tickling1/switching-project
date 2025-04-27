@@ -38,12 +38,6 @@ if [ $? -ne 0 ]; then
 fi
 
 # -----------------------
-# start.sh 권한 부여 (지금 시점에!)
-# -----------------------
-chmod +x $DEPLOY_PATH/start.sh
-echo "✅ start.sh permission granted!"
-
-# -----------------------
 # 현재 실행 중인 포트 확인
 # -----------------------
 echo "🔍 Checking current running port..."
@@ -76,6 +70,22 @@ do
   RESPONSE=$(curl -s http://localhost:$IDLE_PORT$HEALTH_CHECK_PATH | grep '"status":"UP"')
   if [ -n "$RESPONSE" ]; then
     echo "✅ Health check passed!"
+
+        # -----------------------
+        # Nginx 연결 포트 스위칭
+        # -----------------------
+        echo "🔀 Switching Nginx upstream port..."
+
+        CURRENT_PORT_CHECK=$(sudo lsof -i -P -n | grep LISTEN | grep 9090)
+        if [ -z "$CURRENT_PORT_CHECK" ]; then
+          echo "⚡ 9090 is down. Switching Nginx to 9091."
+          sudo sed -i 's/9090/9091/g' /etc/nginx/sites-available/default
+        else
+          echo "⚡ 9091 is down. Switching Nginx to 9090."
+          sudo sed -i 's/9091/9090/g' /etc/nginx/sites-available/default
+        fi
+        sudo nginx -s reload
+        echo "✅ Nginx reloaded with new port."
 
     # -----------------------
     # 기존 서버 종료

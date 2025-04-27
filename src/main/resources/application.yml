@@ -22,8 +22,7 @@ server:
   port: 8080  # 기본 포트 (환경별로 덮어쓰기 가능)
 
 management:
-  endpoint:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health
