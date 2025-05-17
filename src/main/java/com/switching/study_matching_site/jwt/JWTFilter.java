@@ -39,6 +39,7 @@ public class JWTFilter extends OncePerRequestFilter {
         if (requestURI.equals("/login") ||
                 requestURI.equals("/members") ||
                 requestURI.equals("/reissue") ||
+                requestURI.equals("/") ||
                 requestURI.startsWith("/swagger-ui") ||
                 requestURI.startsWith("/v3/api-docs") ||
                 requestURI.startsWith("/swagger-resources") ||

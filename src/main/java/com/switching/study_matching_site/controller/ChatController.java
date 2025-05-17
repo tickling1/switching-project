@@ -1,11 +1,9 @@
 package com.switching.study_matching_site.controller;
 
-import com.switching.study_matching_site.domain.Chat;
 import com.switching.study_matching_site.dto.chat.ChatCreate;
 import com.switching.study_matching_site.dto.chat.ChatRead;
 import com.switching.study_matching_site.service.ChatService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
