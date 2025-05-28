@@ -13,6 +13,7 @@ public enum ErrorCode {
     MEMBER_NOT_FOUND(404, "M001", "회원을 찾지 못했습니다."),
     LOGIN_ID_DUPLICATION(400, "M002", "가입된 아이디가 이미 존재합니다."),
     EMAIL_DUPLICATION(400, "M003", "가입된 이메일이 이미 존재합니다."),
+    PHONE_NUM_DUPLICATION(400, "M004", "가입된 핸드폰 번호가 이미 존재합니다."),
 
     // Login
     LOGIN_INPUT_INVALID(401, "M004", "아이디 또는 비밀번호가 잘못되었습니다."),
