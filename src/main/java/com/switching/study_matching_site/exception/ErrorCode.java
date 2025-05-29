@@ -22,6 +22,7 @@ public enum ErrorCode {
     // Participation & ROOM
     ROOM_NOT_FOUND(404, "R001", "방을 찾지 못했습니다."),
     ROOM_FULL(400, "R002", "방이 가득찼습니다."),
+    NOT_ROOM_ADMIN(403, "R006", "방장 권한이 없습니다."),
     ALREADY_PARTICIPATED(409, "R003", "방에 이미 참여중입니다."),
     PARTICIPATED_NOT_FOUND(400, "R004", "방 참여 상태가 아닙니다."),
     ROOM_FAILED_REMOVE(400, "R005", "방을 삭제하는데 실패하였습니다. 방에 있는 인원들이 모두 나가야 합니다."),
