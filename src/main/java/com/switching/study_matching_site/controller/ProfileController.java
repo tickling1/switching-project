@@ -54,22 +54,18 @@ public class ProfileController {
                             )
                     )
             })
-    @Parameters({
-            @Parameter(name = "profileId", description = "프로필 ID", in = ParameterIn.PATH)
-    })
+
+    @Parameter(name = "profileId", description = "프로필 ID", in = ParameterIn.PATH)
     @GetMapping("/profile/{profileId}")
     public String read( @PathVariable Long profileId) {
-        return profileService.readProfile( profileId).toString();
+        return profileService.readProfile(profileId).toString();
     }
 
     @Operation(summary = "프로필 수정", description = "프로필을 수정합니다.")
-    @Parameters({
-            @Parameter(name = "memberId", description = "members의 id", in = ParameterIn.PATH),
-            @Parameter(name = "profileId", description = "프로필 ID", in = ParameterIn.PATH)
-    })
-    @PutMapping("/profile/{profileId}")
-    public ResponseEntity<Void> update(@PathVariable Long profileId, @RequestBody ProfileUpdateDto profileUpdateDto) {
-        profileService.updateProfile(profileId, profileUpdateDto);
+    @Parameter(name = "ProfileUpdateDto", description = "회원 프로필 수정 DTO")
+    @PutMapping("/profile")
+    public ResponseEntity<Void> update(@RequestBody ProfileUpdateDto profileUpdateDto) {
+        profileService.updateProfile( profileUpdateDto);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

@@ -37,6 +37,7 @@ public enum ErrorCode {
     // Profile
     PROFILE_NOT_FOUND(404, "F001", "프로필을 찾지 못했습니다. 먼저 프로필을 작성해주세요."),
     PROFILE_ALREADY_EXISTS(409, "F002", "프로필이 이미 존재합니다."),
+    PROFILE_IS_PRIVATE(403, "FOO3", "해당 프로필이 사용자에 의해 비공개 처리되었습니다."),
 
     // Notice
     NOTICE_NOT_FOUND(404, "N001", "공지사항을 찾을 수 없습니다."),

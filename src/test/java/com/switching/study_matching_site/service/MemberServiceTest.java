@@ -9,7 +9,6 @@ import com.switching.study_matching_site.dto.member.MemberUpdateDto;
 import com.switching.study_matching_site.exception.ErrorCode;
 import com.switching.study_matching_site.exception.InvalidValueException;
 import com.switching.study_matching_site.repository.MemberRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -39,11 +38,6 @@ class MemberServiceTest {
 
     @InjectMocks
     private MemberService memberService;
-
-    @BeforeEach
-    void setUp() {
-        new MemberService(memberRepository, passwordEncoder, securityUtil);
-    }
 
     private static MemberCreateDto getMemberCreateDto() {
         MemberCreateDto dto = new MemberCreateDto(
@@ -118,6 +112,7 @@ class MemberServiceTest {
         // when & then
         InvalidValueException exception = assertThrows(InvalidValueException.class, () -> memberService.joinMember(dto));
         assertEquals(exception.getErrorCode(), ErrorCode.EMAIL_DUPLICATION);
+
         // save()가 호출되지 않아야 함
         verify(memberRepository, never()).save(any());
     }

@@ -22,6 +22,5 @@ public class DevInitializer {
     public void init() {
         System.out.println("Init method executed");
         memberService.initData(); // 트랜잭션 내에서 실행
-        roomSearchService.initData();
     }
 }
