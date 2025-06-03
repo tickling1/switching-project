@@ -69,18 +69,25 @@ public class Member {
         profile.setMember(this);
     }
 
-    // 친구 요청 (편의 메서드)
     public void addSentRequest(FriendRequest request) {
         sentRequests.add(request);
         request.setSender(this);
-        request.setStatus(RequestStatus.PENDING);
+        //
     }
 
-    // 친구 요청 받기 (편의 메서드)
     public void addReceivedRequest(FriendRequest request) {
         receivedRequests.add(request);
         request.setReceiver(this);
-        request.setStatus(RequestStatus.PENDING);
+    }
+
+    public void removeSentRequest(FriendRequest request) {
+        sentRequests.remove(request);
+        request.setSender(null); // 연관관계 끊기
+    }
+
+    public void removeReceivedRequest(FriendRequest request) {
+        receivedRequests.remove(request);
+        request.setReceiver(null); // 연관관계 끊기
     }
 
 }

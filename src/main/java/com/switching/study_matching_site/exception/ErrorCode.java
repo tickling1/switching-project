@@ -30,6 +30,12 @@ public enum ErrorCode {
     // Friends
     FRIEND_NOT_FOUND(404, "F001", "찾으려는 친구가 존재하지 않습니다."),
     NOT_FRIEND_RELATIONSHIP(404, "F002", "친구 상태가 아닙니다."),
+    ALREADY_FRIEND_RELATIONSHIP(409, "F003", "이미 친구 상태입니다."),
+    ALREADY_FRIENDSHIP_REQUEST(409, "F004", "이미 친구 신청을 보낸 상태입니다."),
+    CANNOT_REQUEST_SELF(401, "F005", "자기 자신에게는 친구 신청을 보낼 수 없습니다."),
+    CANNOT_ACCEPT_REQUEST(403, "F006", "해당 사용자에게 요청을 받지 못했습니다."),
+    CANNOT_REJECT_RELATIONSHIP(403, "F006", "해당 사용자에게 요청을 받지 못했습니다."),
+
 
     // Chat
     CHAT_NOT_FOUND(404, "T001", "채팅을 찾을 수 없습니다."),
