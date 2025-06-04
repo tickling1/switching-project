@@ -3,13 +3,17 @@ package com.switching.study_matching_site.dto.room;
 import com.switching.study_matching_site.domain.*;
 import com.switching.study_matching_site.domain.type.*;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 
 import java.time.LocalTime;
 import java.util.UUID;
 
 @Builder
 @Schema(name = "방 생성 요청 DTO")
+@AllArgsConstructor
+@Getter
 public class RoomCreateDto {
 
     @Schema(description = "방 제목")

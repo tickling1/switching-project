@@ -20,10 +20,10 @@ public class RoomController {
 
     // 방 수정 - 권한자가 수정 가능
     @Operation(summary = "방 내용 수정", description = "방 내용을 수정합니다.")
+    @Parameter(name = "roomId", description = "방 ID", in = ParameterIn.PATH)
     @PutMapping("/rooms/{roomId}")
-    public ResponseEntity<Void> updateRoom(@Parameter(description = "방 ID")
-                                 @PathVariable(name = "roomId")Long roomId,
-                             @RequestBody RoomUpdateDto roomUpdateDto) {
+    public ResponseEntity<Void> updateRoom(@PathVariable(name = "roomId")Long roomId,
+                                           @RequestBody RoomUpdateDto roomUpdateDto) {
         roomService.updateRoom(roomId, roomUpdateDto);
         return new ResponseEntity<>(HttpStatus.OK);
     }
