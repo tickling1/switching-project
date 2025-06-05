@@ -1,13 +1,11 @@
 package com.switching.study_matching_site.controller;
 
-import com.switching.study_matching_site.dto.notice.NoticeRead;
 import com.switching.study_matching_site.dto.profile.ProfileCreateDto;
 import com.switching.study_matching_site.dto.profile.ProfileReadDto;
 import com.switching.study_matching_site.dto.profile.ProfileUpdateDto;
 import com.switching.study_matching_site.service.ProfileService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;

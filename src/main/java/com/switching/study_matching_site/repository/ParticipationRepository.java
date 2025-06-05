@@ -14,4 +14,7 @@ public interface ParticipationRepository extends JpaRepository<Participation, Lo
     @Query("SELECT p FROM Participation p WHERE p.room.id = :roomId AND p.member.id = :memberId")
     Optional<Participation> findByRoomAndMember(@Param("roomId") Long roomId, @Param("memberId") Long memberId);
 
+    @Query("SELECT p FROM Participation p WHERE p.member.id = :memberId AND p.leaveDate IS NULL")
+    Optional<Participation> findActiveParticipation(@Param("memberId") Long memberId);
+
 }

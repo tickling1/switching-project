@@ -123,4 +123,9 @@ public class Room extends BaseTimeEntity{
         }
     }
 
+    public void addNotice(Notice notice) {
+        this.notice_history.add(notice);
+        notice.setRoom(this);
+    }
+
 }
