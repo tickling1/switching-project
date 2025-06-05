@@ -3,18 +3,22 @@ package com.switching.study_matching_site.dto.chat;
 
 import com.switching.study_matching_site.domain.Chat;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Builder
 @Getter
 @Setter
 @Schema(description = "채팅 응답 DTO")
-public class ChatRead {
+public class ChatReadDto {
+
+    @Schema(description = "채팅을 보낸 사람")
+    private String username;
 
     @Schema(description = "채팅 내용")
     private String chatContent;
@@ -22,11 +26,9 @@ public class ChatRead {
     @Schema(description = "채팅 일자")
     private LocalDateTime chatDateTime;
 
-    @Schema(description = "채팅을 보낸 사람")
-    private String username;
 
-    public static ChatRead fromEntity(Chat chat) {
-        return ChatRead.builder()
+    public static ChatReadDto fromEntity(Chat chat) {
+        return ChatReadDto.builder()
                 .chatContent(chat.getChatContent())
                 .chatDateTime(chat.getChatDateTime())
                 .username(chat.getWriter())
@@ -35,10 +37,7 @@ public class ChatRead {
 
     @Override
     public String toString() {
-        return "ChatRead{" +
-                "chatContent='" + chatContent + '\'' +
-                ", chatDateTime=" + chatDateTime +
-                ", username='" + username + '\'' +
-                '}';
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        return "[" + username + ": " + chatContent + "] at " + chatDateTime.format(formatter);
     }
 }

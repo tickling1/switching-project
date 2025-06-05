@@ -38,7 +38,7 @@ public enum ErrorCode {
 
 
     // Chat
-    CHAT_NOT_FOUND(404, "T001", "채팅을 찾을 수 없습니다."),
+    CHAT_NOT_FOUND(404, "T001", "아직 채팅이 없습니다."),
 
     // Profile
     PROFILE_NOT_FOUND(404, "F001", "프로필을 찾지 못했습니다. 먼저 프로필을 작성해주세요."),

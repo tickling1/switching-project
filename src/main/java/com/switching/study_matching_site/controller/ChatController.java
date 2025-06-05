@@ -1,14 +1,16 @@
 package com.switching.study_matching_site.controller;
 
-import com.switching.study_matching_site.dto.chat.ChatCreate;
-import com.switching.study_matching_site.dto.chat.ChatRead;
+import com.switching.study_matching_site.dto.chat.ChatCreateDto;
+import com.switching.study_matching_site.dto.chat.ChatReadDto;
 import com.switching.study_matching_site.service.ChatService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,14 +29,15 @@ public class ChatController {
                     description = "채팅 등록 성공",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ChatRead.class)
+                            schema = @Schema(implementation = ChatReadDto.class)
                     )
             )
     })
-    @PostMapping("/rooms/{roomId}/chats")
-    public String addChat(@PathVariable Long roomId, @RequestBody ChatCreate chatCreate) {
-        ChatRead chat = chatService.createChat(chatCreate, roomId);
-        return chat.toString();
+    @PostMapping("/rooms/chats")
+    @Parameter(name = "ChatCreateDto", description = "채팅 생성 DTO")
+    public ResponseEntity<String> addChat(@RequestBody ChatCreateDto chatCreateDto) {
+        ChatReadDto chat = chatService.createChat(chatCreateDto);
+        return ResponseEntity.ok().body(chat.toString());
     }
     
     @Operation(summary = "채팅 불러오기", description = "채팅 내역을 확인합니다.", responses = {
@@ -43,13 +46,13 @@ public class ChatController {
                     description = "채팅 내역 조회 성공",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ChatRead.class)
+                            schema = @Schema(implementation = ChatReadDto.class)
                     )
             )
     })
-    @GetMapping("/rooms/{roomId}/chats")
-    public String readChat(@PathVariable Long roomId) {
-        List<ChatRead> chatReads = chatService.readChat(roomId);
-        return chatReads.toString();
+    @GetMapping("/rooms/chats")
+    public ResponseEntity<List<ChatReadDto>> readChat() {
+        List<ChatReadDto> chatHistory = chatService.readChat();
+        return ResponseEntity.ok().body(chatHistory);
     }
 }

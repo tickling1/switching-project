@@ -128,4 +128,10 @@ public class Room extends BaseTimeEntity{
         notice.setRoom(this);
     }
 
+    public void addChat(Chat chat, String username) {
+        this.chat_history.add(chat);
+        chat.setWriter(username);
+        chat.setRoom(this);
+    }
+
 }

@@ -1,14 +1,11 @@
 package com.switching.study_matching_site.controller;
 
-import com.switching.study_matching_site.dto.chat.ChatRead;
-import com.switching.study_matching_site.dto.member.LoginDto;
 import com.switching.study_matching_site.dto.member.MemberCreateDto;
 import com.switching.study_matching_site.dto.member.MemberReadDto;
 import com.switching.study_matching_site.dto.member.MemberUpdateDto;
 import com.switching.study_matching_site.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -16,7 +13,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
