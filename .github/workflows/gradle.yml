@@ -24,6 +24,15 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew clean build
 
+      - name: Generate JaCoCo Test Coverage Report
+        run: ./gradlew jacocoTestReport
+
+      - name: Upload JaCoCo Report as Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: jacoco-report
+          path: build/reports/jacoco/test/html
+
       - name: Rename jar for deployment
         run: mv build/libs/*.jar build/libs/app.jar
 
