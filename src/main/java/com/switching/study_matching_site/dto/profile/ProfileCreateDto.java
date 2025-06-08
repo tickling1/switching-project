@@ -55,7 +55,6 @@ public class ProfileCreateDto {
     @Schema(description = "프로필 공개 여부")
     private Boolean isPrivate; // true면 비공개, false면 공개
 
-
     public Profile toProfile() {
         Profile entity = new Profile();
         entity.setOfflineStatus(this.isOffline);

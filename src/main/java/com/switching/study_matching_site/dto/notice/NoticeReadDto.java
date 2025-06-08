@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @Getter
 @Schema(name = "공지사항 보기 응답 DTO")
-public class NoticeRead {
+public class NoticeReadDto {
 
     @Schema(description = "공지사항 제목")
     private String title;
@@ -21,8 +21,8 @@ public class NoticeRead {
     /**
      * ENTITY -> DTO 변환 메소드
      */
-    public static NoticeRead fromEntity(Notice entity){
-        return NoticeRead.builder()
+    public static NoticeReadDto fromEntity(Notice entity){
+        return NoticeReadDto.builder()
                 .title(entity.getNoticeTitle())
                 .content(entity.getNoticeContent())
                 .build();

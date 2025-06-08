@@ -3,13 +3,16 @@ package com.switching.study_matching_site.domain;
 import com.switching.study_matching_site.domain.type.*;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@NoArgsConstructor
 @Getter
 @Setter
 public class Room extends BaseTimeEntity{
@@ -79,6 +82,7 @@ public class Room extends BaseTimeEntity{
                 Integer projectLevel,
                 Region projectRegion,
                 OfflineStatus offlineStatus) {
+
         this.roomTitle = roomTitle;
         this.roomStatus = roomStatus;
         this.currentCount = currentCount;
@@ -92,7 +96,42 @@ public class Room extends BaseTimeEntity{
         this.offlineStatus = offlineStatus;
     }
 
-    public Room() {
-
+    // 연관관계 정리 메서드
+    public void clearParticipation() {
+        for (Participation p : this.getParticipation_history()) {
+            p.getMember().setEnterStatus(EnterStatus.OUT);
+            p.setLeaveDate(LocalDateTime.now());
+        }
+        this.getParticipation_history().clear();
     }
+
+    public void leaveRoomMember(Member member) {
+        Participation targetParticipation = null;
+
+        for (Participation p : this.participation_history) {
+            if (p.getMember().equals(member)) {
+                targetParticipation = p;
+                break;
+            }
+        }
+
+        if (targetParticipation != null) {
+            // 참여자 상태 변경
+            targetParticipation.setLeaveDate(LocalDateTime.now());
+            member.setEnterStatus(EnterStatus.OUT);
+            this.setCurrentCount(this.getCurrentCount() - 1);
+        }
+    }
+
+    public void addNotice(Notice notice) {
+        this.notice_history.add(notice);
+        notice.setRoom(this);
+    }
+
+    public void addChat(Chat chat, String username) {
+        this.chat_history.add(chat);
+        chat.setWriter(username);
+        chat.setRoom(this);
+    }
+
 }

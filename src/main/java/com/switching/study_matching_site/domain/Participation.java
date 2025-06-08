@@ -3,12 +3,15 @@ package com.switching.study_matching_site.domain;
 import com.switching.study_matching_site.domain.type.EnterStatus;
 import com.switching.study_matching_site.domain.type.RoleType;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Entity
+@NoArgsConstructor
 @Getter
 @Setter
 public class Participation {
@@ -40,15 +43,13 @@ public class Participation {
         this.roleType = roleType;
         this.joinDate = LocalDateTime.now();
         this.leaveDate = null;
-        this.room = room;
         this.member = member;
-
-        member.setEnterStatus(EnterStatus.ENTER);
+        this.room = room;
+        member.getParticipation_history().add(this);
         room.getParticipation_history().add(this);
+        member.setEnterStatus(EnterStatus.ENTER);
         room.setCurrentCount(room.getCurrentCount() + 1);
     }
 
-    public Participation() {
-    }
     
 }

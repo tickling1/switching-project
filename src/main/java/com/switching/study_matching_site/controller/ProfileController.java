@@ -1,13 +1,11 @@
 package com.switching.study_matching_site.controller;
 
-import com.switching.study_matching_site.dto.notice.NoticeRead;
 import com.switching.study_matching_site.dto.profile.ProfileCreateDto;
 import com.switching.study_matching_site.dto.profile.ProfileReadDto;
 import com.switching.study_matching_site.dto.profile.ProfileUpdateDto;
 import com.switching.study_matching_site.service.ProfileService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -54,22 +52,18 @@ public class ProfileController {
                             )
                     )
             })
-    @Parameters({
-            @Parameter(name = "profileId", description = "프로필 ID", in = ParameterIn.PATH)
-    })
+
+    @Parameter(name = "profileId", description = "프로필 ID", in = ParameterIn.PATH)
     @GetMapping("/profile/{profileId}")
     public String read( @PathVariable Long profileId) {
-        return profileService.readProfile( profileId).toString();
+        return profileService.readProfile(profileId).toString();
     }
 
     @Operation(summary = "프로필 수정", description = "프로필을 수정합니다.")
-    @Parameters({
-            @Parameter(name = "memberId", description = "members의 id", in = ParameterIn.PATH),
-            @Parameter(name = "profileId", description = "프로필 ID", in = ParameterIn.PATH)
-    })
-    @PutMapping("/profile/{profileId}")
-    public ResponseEntity<Void> update(@PathVariable Long profileId, @RequestBody ProfileUpdateDto profileUpdateDto) {
-        profileService.updateProfile(profileId, profileUpdateDto);
+    @Parameter(name = "ProfileUpdateDto", description = "회원 프로필 수정 DTO")
+    @PutMapping("/profile")
+    public ResponseEntity<Void> update(@RequestBody ProfileUpdateDto profileUpdateDto) {
+        profileService.updateProfile( profileUpdateDto);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

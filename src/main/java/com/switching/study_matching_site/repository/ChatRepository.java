@@ -11,6 +11,6 @@ import java.util.Optional;
 public interface ChatRepository extends JpaRepository<Chat, Long> {
 
     @Query("SELECT r.chat_history from Room r where r.id = :roomId")
-    Optional<List<Chat>> findByRoom(@Param("roomId") Long roomId);
+    Optional<List<Chat>> findChatHistory(@Param("roomId") Long roomId);
 
 }

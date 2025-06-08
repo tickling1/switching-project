@@ -4,10 +4,12 @@ import com.switching.study_matching_site.domain.*;
 import com.switching.study_matching_site.domain.type.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
+import lombok.Getter;
 
 import java.time.LocalTime;
 
 @Builder
+@Getter
 @Schema(name = "방 상세 정보 응답 DTO")
 public class RoomDetailDto {
 

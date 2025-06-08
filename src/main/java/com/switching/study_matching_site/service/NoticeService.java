@@ -3,19 +3,16 @@ package com.switching.study_matching_site.service;
 import com.switching.study_matching_site.SecurityUtil;
 import com.switching.study_matching_site.domain.*;
 import com.switching.study_matching_site.domain.type.RoleType;
-import com.switching.study_matching_site.dto.notice.NoticeCreate;
-import com.switching.study_matching_site.dto.notice.NoticeRead;
+import com.switching.study_matching_site.dto.notice.NoticeCreateDto;
+import com.switching.study_matching_site.dto.notice.NoticeReadDto;
 import com.switching.study_matching_site.exception.EntityNotFoundException;
 import com.switching.study_matching_site.exception.ErrorCode;
 import com.switching.study_matching_site.exception.InvalidValueException;
 import com.switching.study_matching_site.repository.NoticeRepository;
 import com.switching.study_matching_site.repository.ParticipationRepository;
-import com.switching.study_matching_site.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @Service
 @Transactional
@@ -23,41 +20,60 @@ import java.util.Optional;
 public class NoticeService {
 
     private final NoticeRepository noticeRepository;
-    private final RoomRepository roomRepository;
     private final ParticipationRepository participationRepository;
     private final SecurityUtil securityUtil;
 
-    // 공지사항 생성 - 방 ID (방장만 가능)
-    public Long addNotice(NoticeCreate noticeCreateDto, Long roomId) {
+    /**
+     * 공지사항 생성
+     * 참여하고 있는 활동이없다면 예외르 터트림
+     * 참여하고 있는 방이 없다면 예외를 터트림
+     * 참여하고 있는 방의 방장이 아니라면 예외르 터트림
+     *
+     */
+    public void addNotice(NoticeCreateDto noticeCreateDto) {
+
+        Participation participation = findParticipationBySecurity();
+        Room room = participation.getRoom();
+        if (room == null) {
+         throw new EntityNotFoundException(ErrorCode.ROOM_NOT_FOUND)   ;
+        }
 
         Notice newNotice = noticeCreateDto.toEntity();
-        Optional<Room> findRoom = roomRepository.findById(roomId);
-        // 멤버 룰 찾기 위해 
-        Optional<Participation> findRule = participationRepository.findByRoomAndMember(roomId, securityUtil.getMemberIdByUserDetails());
 
-        if (findRoom.isPresent() && findRule.isPresent()) {
-            newNotice.setRoom(findRoom.get());
-            RoleType roleType = findRule.get().getRoleType();
-            if (roleType == RoleType.ADMIN) {
-                Notice savedNotice = noticeRepository.save(newNotice);
-                return savedNotice.getId();
-            } else {
-                throw new InvalidValueException(ErrorCode.NOTICE_FORBIDDEN);
-            }
+        RoleType roleType = participation.getRoleType();
+        if (roleType == RoleType.ADMIN) {
+            // 연관관계 메서드
+            room.addNotice(newNotice);
+            noticeRepository.save(newNotice);
         } else {
-            throw new EntityNotFoundException(ErrorCode.ROOM_NOT_FOUND);
+            throw new InvalidValueException(ErrorCode.NOTICE_FORBIDDEN);
         }
     }
 
-    // 공지사항 보기 - 방 ID
+    /**
+     * 공지사항 보기
+     * 방에 참여하지 않았을 경우 예외를 일으켜야 함
+     * 해당 공지사항이 없으면 예외를 일으켜야 함.
+     */
     @Transactional(readOnly = true)
-    public NoticeRead readNotice(Long roomId, Long noticeId) {
-        Optional<Notice> findNotice = noticeRepository.findByRoom(roomId, noticeId);
-        if (findNotice.isPresent()) {
-            NoticeRead noticeRead = NoticeRead.fromEntity(findNotice.get());
-            return noticeRead;
-        } else {
-            throw new EntityNotFoundException(ErrorCode.NOTICE_NOT_FOUND);
+    public NoticeReadDto readNotice(Long noticeId) {
+
+        Participation participation = findParticipationBySecurity();
+        Room room = participation.getRoom();
+        if (room == null) {
+            throw new EntityNotFoundException(ErrorCode.ROOM_NOT_FOUND);
         }
+
+        Notice findNotice = noticeRepository.findById(noticeId).orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOTICE_NOT_FOUND));
+        NoticeReadDto noticeReadDtoResponse = NoticeReadDto.fromEntity(findNotice);
+        return noticeReadDtoResponse;
+    }
+
+    // Security 을 이용해 멤버의 참여찾기
+    private Participation findParticipationBySecurity() {
+        Long memberId = securityUtil.getMemberIdByUserDetails();
+        Participation findParticipation = participationRepository.findActiveParticipation(memberId).orElseThrow(
+                () -> new EntityNotFoundException(ErrorCode.PARTICIPATED_NOT_FOUND));
+        return findParticipation;
     }
 }

@@ -23,8 +23,6 @@ import java.time.LocalTime;
 @Schema(name = "프로필 수정 요청 DTO")
 public class ProfileUpdateDto {
 
-    private Long id;
-
     @Schema(description = "오프라인 여부", example = "OFFLINE, ONLINEb")
     private OfflineStatus isOffline; // true면 오프라인, false면 온라인
 
@@ -72,7 +70,6 @@ public class ProfileUpdateDto {
     public static ProfileUpdateDto fromProfile(Profile profile) {
 
         return new ProfileUpdateDto(
-                profile.getId(),
                 profile.getOfflineStatus(),
                 profile.getTechSkill(),
                 profile.getDesiredLevel(),

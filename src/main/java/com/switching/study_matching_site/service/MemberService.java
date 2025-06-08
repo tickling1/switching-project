@@ -32,9 +32,8 @@ public class MemberService {
     /**
      * 회원 가입 - 중복 회원 검증 후 가입
      */
-
     public Long joinMember(MemberCreateDto memberCreateDto) {
-        validateDuplicateMember(memberCreateDto);
+        validateDuplicateCreateMember(memberCreateDto);
         Member member = memberCreateDto.toEntity();
         member.setPassword(bCryptPasswordEncoder.encode(member.getPassword()));
         Member savedMember = memberRepository.save(member);
@@ -61,13 +60,19 @@ public class MemberService {
      * 회원 정보 수정
      */
     public void updateMember(Long memberId, MemberUpdateDto memberUpdateDto) {
-
         Optional<Member> findMember = memberRepository.findById(memberId);
+
         if (findMember.isPresent()) {
             Member member = findMember.get();
             if (memberUpdateDto.getUsername() != null) member.setUsername(memberUpdateDto.getUsername());
-            if (memberUpdateDto.getEmail() != null) member.setEmail(memberUpdateDto.getEmail());
-            if (memberUpdateDto.getPhoneNumber() != null) member.setPhoneNumber(memberUpdateDto.getPhoneNumber());
+            if (memberUpdateDto.getEmail() != null) {
+                validateDuplicateUpdateEmail(memberUpdateDto);
+                member.setEmail(memberUpdateDto.getEmail());
+            }
+            if (memberUpdateDto.getPhoneNumber() != null) {
+                validateDuplicateUpdatePhoneNum(memberUpdateDto);
+                member.setPhoneNumber(memberUpdateDto.getPhoneNumber());
+            }
             if (memberUpdateDto.getPassword() != null) {
                 member.setPassword(bCryptPasswordEncoder.encode(memberUpdateDto.getPassword()));
             }
@@ -99,18 +104,38 @@ public class MemberService {
 
     /**
      * 중복 아이디 검사하기
-     * - 동시성 문제 발생 가능(유니크 제약 조건)
+     * 중복 아이디, 중복 이메일, 중복 핸드폰 번호 검사
      */
-    private void validateDuplicateMember(MemberCreateDto memberCreateDTO) {
+    private void validateDuplicateCreateMember(MemberCreateDto memberCreateDTO) {
         Optional<Member> findMember = memberRepository.findByLoginId(memberCreateDTO.getLoginId());
         if (findMember.isPresent()) {
-            throw new InvalidValueException(ErrorCode.LOGIN_ID_DUPLICATION );
+            throw new InvalidValueException(ErrorCode.LOGIN_ID_DUPLICATION);
         }
         Optional<Member> findMemberEmail = memberRepository.findByEmail(memberCreateDTO.getEmail());
         if (findMemberEmail.isPresent()) {
             throw new InvalidValueException(ErrorCode.EMAIL_DUPLICATION);
         }
+        Optional<Member> findMemberPhoneNum = memberRepository.findByPhoneNumber(memberCreateDTO.getPhoneNumber());
+        if (findMemberPhoneNum.isPresent()) {
+            throw new InvalidValueException(ErrorCode.PHONE_NUM_DUPLICATION);
+        }
     }
+
+    private void validateDuplicateUpdateEmail(MemberUpdateDto memberUpdateDto) {
+        Optional<Member> findMemberEmail = memberRepository.findByEmail(memberUpdateDto.getEmail());
+        if (findMemberEmail.isPresent()) {
+            throw new InvalidValueException(ErrorCode.EMAIL_DUPLICATION);
+        }
+    }
+
+    private void validateDuplicateUpdatePhoneNum(MemberUpdateDto memberUpdateDto) {
+        Optional<Member> findMemberPhoneNum = memberRepository.findByPhoneNumber(memberUpdateDto.getPhoneNumber());
+        if (findMemberPhoneNum.isPresent()) {
+            throw new InvalidValueException(ErrorCode.PHONE_NUM_DUPLICATION);
+        }
+    }
+
+
 
     @Profile("dev")
     public void initData() {
