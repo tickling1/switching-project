@@ -70,7 +70,7 @@ public class FriendRequestService {
         return new FriendRequestResponse(
                 sender.getId(),
                 receiverId,
-                RequestStatus.PENDING
+                newRequest.getStatus()
         );
     }
 
@@ -128,6 +128,7 @@ public class FriendRequestService {
     /**
      * 친구 목록 조회
      * 친구 상태의 전체 목록을 조회해옵니다.
+     * N+1 문제 발견
      */
     @Transactional(readOnly = true)
     public FriendsListResponse myFriends() {
@@ -154,6 +155,7 @@ public class FriendRequestService {
     /**
      * 내가 받은 친구 요청 목록
      * 친구 상태가 대기 중인 받은 요청 목록을 불러옵니다.
+     * N+1 문제 발견
      */
     @Transactional(readOnly = true)
     public FriendsListResponse myReceived() {
@@ -173,6 +175,7 @@ public class FriendRequestService {
     /**
      * 내 친구 요청 목록
      * 친구 상태가 대기 중인 보낸 요청 목록을 불러옵니다.
+     * N+1 문제 발생
      */
     @Transactional(readOnly = true)
     public FriendsListResponse myRequests() {

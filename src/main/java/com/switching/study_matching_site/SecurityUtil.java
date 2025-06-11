@@ -38,12 +38,12 @@ public class SecurityUtil {
         /**
          * Authentication 객체의 getPrincipal() 메서드는 사용자 정보를 반환한다.
          * 반환 값의 타입은 보안 설정과 인증 메커니즘에 따라 달라질 수 있다.
-         * @return memberId
          */
         if (authentication.getPrincipal() instanceof CustomUserDetails) {
             CustomUserDetails principal = (CustomUserDetails) authentication.getPrincipal();
             memberId = principal.getMemberId();
         }
+        System.out.println("memberId from principal: " + memberId);
 
         return memberId;
     }

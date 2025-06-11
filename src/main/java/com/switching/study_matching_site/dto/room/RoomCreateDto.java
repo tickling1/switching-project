@@ -18,12 +18,6 @@ public class RoomCreateDto {
 
     @Schema(description = "방 제목")
     private String roomTitle;
-
-    @Schema(description = "방 상태", defaultValue = "ON")
-    private RoomStatus roomStatus;
-    
-    @Schema(description = "현재 인원 수", defaultValue = "0")
-    private Integer currentCount;
     
     @Schema(description = "최대 인원 수")
     private Integer maxCount;
@@ -46,7 +40,7 @@ public class RoomCreateDto {
     @Schema(description = "스터디 가능 지역", example = "SEOUL")
     private Region projectRegion;
 
-    @Schema(description = "오프라인 여부", example = "OFFLINE, ONLINEb")
+    @Schema(description = "오프라인 여부", example = "OFFLINE, ONLINE")
     private OfflineStatus offlineStatus;
 
     /**

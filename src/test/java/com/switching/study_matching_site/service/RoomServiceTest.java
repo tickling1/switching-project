@@ -492,7 +492,6 @@ class RoomServiceTest {
         // then
         assertNotNull(participation2.getLeaveDate());
         assertEquals(EnterStatus.OUT, user.getEnterStatus());
-
     }
 
     @Test
@@ -627,6 +626,7 @@ class RoomServiceTest {
         EntityNotFoundException ex = assertThrows(EntityNotFoundException.class, () -> roomService.participateWithUUID(room.getUuid()));
         assertEquals(ErrorCode.ROOM_NOT_FOUND, ex.getErrorCode());
     }
+
     @Test
     void 방에_이미_참여() {
         // given

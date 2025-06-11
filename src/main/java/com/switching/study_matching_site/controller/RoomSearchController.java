@@ -37,7 +37,7 @@ public class RoomSearchController {
                     )
             })
 
-    @GetMapping("/rooms")
+    @GetMapping("/rooms/list")
     public PageResponseDto<RoomInfoResponseDto> roomList() {
         return roomSearchService.roomInfoList();
     }

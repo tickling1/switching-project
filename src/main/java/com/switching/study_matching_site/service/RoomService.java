@@ -107,6 +107,7 @@ public class RoomService {
      * 들어가려는 방이 존재하지 않다면 예외를 터트려야 함.
      * 방을 참여한 후에는 멤버의 EnterStatus 가 Enter(참여) 으로 되어있어야 함.
      * (Participation을 생성하면 Enter 상태로 변환)
+     * 동시성
      */
     public void participateRoom(Long roomId) {
         Member findMember = securityUtil.getMemberByUserDetails();
@@ -115,7 +116,8 @@ public class RoomService {
         isParticipationRoom(findMember);
 
         // 방이 없다면 예외 발생
-        Room room = roomRepository.findById(roomId).orElseThrow(() -> new EntityNotFoundException(ErrorCode.ROOM_NOT_FOUND));
+        // + 방이 없고, 방 상태가 OFF 여야함.
+        Room room = roomRepository.findRoomIdActivity(roomId).orElseThrow(() -> new EntityNotFoundException(ErrorCode.ROOM_NOT_FOUND));
 
         // 현재 방 인원이 설정된 방에 인원보다 같거나 많을 경우 예외 발생
         if (room.getCurrentCount() + 1 > room.getMaxCount()) throw new InvalidValueException(ErrorCode.ROOM_FULL);
@@ -132,6 +134,7 @@ public class RoomService {
      * 방 퇴장
      * 방장이 방을 퇴장했을 때, 방에 있는 랜덤한 인원한테 방장을 부여해야 함.
      * 방장이든 유저든 나간 후에는 방 입장 상태가 OUT 상태로 바뀌어야하고 나간 시간이 기록되어야 함.
+     * 동시성
      */
     public void leaveRoom(Long roomId) {
         Member member = securityUtil.getMemberByUserDetails();

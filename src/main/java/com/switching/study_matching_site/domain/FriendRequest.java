@@ -38,6 +38,7 @@ public class FriendRequest {
         this.receiver = receiver;
         this.sendMemberId = sender.getLoginId();
         this.receiveMemberId = receiver.getLoginId();
+        this.status = RequestStatus.PENDING;
     }
 
     // 친구 요청 수락

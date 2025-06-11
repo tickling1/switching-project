@@ -72,6 +72,5 @@ public class ChatService {
             chatReads.add(chatRead);
             }
         return chatReads;
-
     }
 }
