@@ -111,7 +111,6 @@ public class RoomService {
      * 들어가려는 방이 존재하지 않다면 예외를 터트려야 함.
      * 방을 참여한 후에는 멤버의 EnterStatus 가 Enter(참여) 으로 되어있어야 함.
      * (Participation을 생성하면 Enter 상태로 변환)
-     * 동시성
      */
     public synchronized void participateRoomWithSynchronized(Long roomId) {
         Member findMember = securityUtil.getMemberByUserDetails();
@@ -134,6 +133,9 @@ public class RoomService {
         em.flush();
     }
 
+    /**
+     * JPA 비관적 락으로 동시성 문제 해결
+     */
     public void participateRoom(Long roomId) throws PessimisticEntityLockException, LockTimeoutException {
         Member findMember = securityUtil.getMemberByUserDetails();
         // 회원이 다른 방에 이미 참여 중인지 확인
@@ -162,48 +164,46 @@ public class RoomService {
      * 방장이든 유저든 나간 후에는 방 입장 상태가 OUT 상태로 바뀌어야하고 나간 시간이 기록되어야 함.
      * 동시성
      */
-    public void leaveRoom(Long roomId) {
+    public void leaveRoom(Long roomId) throws PessimisticEntityLockException, LockTimeoutException {
         Member member = securityUtil.getMemberByUserDetails();
-        Room findRoom = roomRepository.findById(roomId).orElseThrow(() -> new EntityNotFoundException(ErrorCode.ROOM_NOT_FOUND));
+        Room findRoom = roomRepository.findByIdWithLock(roomId).orElseThrow(() -> new EntityNotFoundException(ErrorCode.ROOM_NOT_FOUND));
 
-        Participation participation = participationRepository.findByRoomAndMember(roomId, member.getId())
+        Participation participation = participationRepository.findByRoomAndMemberWithLock(roomId, member.getId())
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.PARTICIPATED_NOT_FOUND));
 
-        // 방장일 경우 다음 사람에게 방장을 넘김.
+        // 퇴장 처리
+        participation.setLeaveDate(LocalDateTime.now());
+        member.setEnterStatus(EnterStatus.OUT);
+        findRoom.setCurrentCount(findRoom.getCurrentCount() - 1);
+
+        // 방장일 경우 → 위임 처리
         if (participation.getRoleType() == RoleType.ADMIN) {
-            // 방장 상태를 바꿈
-            member.setEnterStatus(EnterStatus.OUT);
-            participation.setLeaveDate(LocalDateTime.now());
-            // 방의 참여기록을 가져오고
-            List<Participation> history = findRoom.getParticipation_history();
-            // 자료구조에 후보자들을 넣음(후보자 기준: 나간 기록이 없는 참여자들)
-            ArrayList<Participation> candidate = new ArrayList<>();
-            for (Participation p : history) {
-                if (p.getLeaveDate() == null) {
-                    candidate.add(p);
-                }
-            }
-            // 첫번째 후보자에게 방장 부여
-            if (!candidate.isEmpty()) {
-                Participation participant = candidate.get(0);
-                participant.setRoleType(RoleType.ADMIN);
+            // 위임 대상 후보자 조회 (나가지 않았고, 자신이 아닌 참여자)
+            List<Participation> candidates = participationRepository
+                    .findHandOverCandidates(findRoom.getId(), member.getId());
+            if (!candidates.isEmpty()) {
+                Participation nextAdmin = candidates.get(0);
+                nextAdmin.setRoleType(RoleType.ADMIN);
             } else {
-                // 방에 아무도 없으면 삭제(방장 없음 처리)
+                // 아무도 없다면 방 종료 처리
                 findRoom.setRoomStatus(RoomStatus.OFF);
             }
         }
-        // 일반 회원이라면 방 입장 상태와 나간 시간 기록하고 퇴장
-        findRoom.leaveRoomMember(member);
     }
 
     /**
      * UUID 로 방참여
      */
-    public void participateWithUUID(String uuid) {
+    public void participateWithUUID(String uuid) throws PessimisticEntityLockException, LockTimeoutException{
         Member findMember = securityUtil.getMemberByUserDetails();
         isParticipationRoom(findMember);
 
         Room findRoom = roomRepository.findRoomByUuid(uuid).orElseThrow(() -> new EntityNotFoundException(ErrorCode.ROOM_NOT_FOUND));
+
+        // 현재 방 인원이 설정된 방에 인원보다 같거나 많을 경우 예외 발생
+        if (findRoom.getCurrentCount() + 1 > findRoom.getMaxCount()) {
+            throw new InvalidValueException(ErrorCode.ROOM_FULL);
+        }
 
         Participation participation = new Participation(findRoom, RoleType.USER, findMember);
         participation.setMember(findMember);
