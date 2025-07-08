@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @SpringBootTest
+@ActiveProfiles("test")
 @Transactional
 public class testNPlusOneProblemTest {
 
