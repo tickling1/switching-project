@@ -4,6 +4,7 @@ import com.switching.study_matching_site.domain.type.EnterStatus;
 import com.switching.study_matching_site.domain.type.RequestStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
 public class Member {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -90,4 +92,13 @@ public class Member {
         request.setReceiver(null); // 연관관계 끊기
     }
 
+    public Member(String loginId, String password, String username, LocalDate birthDate, String email, String phoneNumber, EnterStatus enterStatus) {
+        this.loginId = loginId;
+        this.password = password;
+        this.username = username;
+        this.birthDate = birthDate;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.enterStatus = enterStatus;
+    }
 }

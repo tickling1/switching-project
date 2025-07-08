@@ -67,8 +67,6 @@ class FriendRequestServiceTest {
         Member receiver = createMember2();
 
         FriendRequest friendRequest = new FriendRequest(sender, receiver);
-        friendRequest.setSendMemberId(sender.getUsername());
-        friendRequest.setReceiveMemberId(receiver.getUsername());
         friendRequest.setStatus(RequestStatus.ACCEPTED);
 
         when(securityUtil.getMemberByUserDetails()).thenReturn(sender);
@@ -93,8 +91,6 @@ class FriendRequestServiceTest {
         Member receiver = createMember2();
 
         FriendRequest friendRequest = new FriendRequest(sender, receiver);
-        friendRequest.setSendMemberId(sender.getUsername());
-        friendRequest.setReceiveMemberId(receiver.getUsername());
 
         when(securityUtil.getMemberByUserDetails()).thenReturn(sender);
         when(memberRepository.findById(any())).thenReturn(Optional.of(receiver));
@@ -127,8 +123,6 @@ class FriendRequestServiceTest {
         FriendRequest friendRequest = new FriendRequest(sender, receiver);
         friendRequest.setSender(sender);
         friendRequest.setReceiver(receiver);
-        friendRequest.setSendMemberId(sender.getUsername());
-        friendRequest.setReceiveMemberId(receiver.getUsername());
         friendRequest.setStatus(RequestStatus.PENDING);
 
         when(securityUtil.getMemberIdByUserDetails()).thenReturn(receiver.getId());
@@ -149,8 +143,6 @@ class FriendRequestServiceTest {
         FriendRequest friendRequest = new FriendRequest(sender, receiver);
         friendRequest.setSender(sender);
         friendRequest.setReceiver(receiver);
-        friendRequest.setSendMemberId(sender.getUsername());
-        friendRequest.setReceiveMemberId(receiver.getUsername());
         friendRequest.setStatus(RequestStatus.ACCEPTED);
 
         when(securityUtil.getMemberIdByUserDetails()).thenReturn(receiver.getId());
@@ -181,8 +173,7 @@ class FriendRequestServiceTest {
         friendRequest.setId(1L);
         friendRequest.setSender(sender);
         friendRequest.setReceiver(receiver);
-        friendRequest.setSendMemberId(sender.getUsername());
-        friendRequest.setReceiveMemberId(receiver.getUsername());
+
         friendRequest.setStatus(RequestStatus.PENDING);
 
         when(securityUtil.getMemberIdByUserDetails()).thenReturn(receiver.getId());
@@ -216,8 +207,6 @@ class FriendRequestServiceTest {
         friendRequest.setId(1L);
         friendRequest.setSender(member);
         friendRequest.setReceiver(removeMember);
-        friendRequest.setSendMemberId(member.getUsername());
-        friendRequest.setReceiveMemberId(removeMember.getUsername());
         friendRequest.setStatus(RequestStatus.ACCEPTED);
 
         when(securityUtil.getMemberIdByUserDetails()).thenReturn(member.getId());
@@ -259,16 +248,13 @@ class FriendRequestServiceTest {
         friendRequest1.setId(1L);
         friendRequest1.setSender(member);
         friendRequest1.setReceiver(friend1);
-        friendRequest1.setSendMemberId(member.getUsername());
-        friendRequest1.setReceiveMemberId(friend1.getUsername());
+
         friendRequest1.setStatus(RequestStatus.ACCEPTED);
 
         FriendRequest friendRequest2 = new FriendRequest(friend2, member);
         friendRequest2.setId(2L);
         friendRequest2.setSender(friend2);
         friendRequest2.setReceiver(member);
-        friendRequest2.setSendMemberId(friend2.getUsername());
-        friendRequest2.setReceiveMemberId(member.getUsername());
         friendRequest2.setStatus(RequestStatus.ACCEPTED);
 
         List<FriendRequest> myFriends = new ArrayList<>();
@@ -276,7 +262,7 @@ class FriendRequestServiceTest {
         myFriends.add(friendRequest2);
 
         when(securityUtil.getMemberIdByUserDetails()).thenReturn(member.getId());
-        when(friendRequestRepository.findFriends(member.getId())).thenReturn(myFriends);
+        when(friendRequestRepository.findMyFriends(member.getId())).thenReturn(myFriends);
 
         // when
         FriendsListResponse friendsListResponse = friendRequestService.myFriends();
@@ -285,7 +271,7 @@ class FriendRequestServiceTest {
         assertEquals(2, friendsListResponse.getFriends().size());
         assertEquals(friend1.getUsername(), friendsListResponse.getFriends().get(100L));
         assertEquals(friend2.getUsername(), friendsListResponse.getFriends().get(30L));
-        verify(friendRequestRepository, times(1)).findFriends(member.getId());
+        verify(friendRequestRepository, times(1)).findMyFriends(member.getId());
 
     }
 
@@ -297,14 +283,14 @@ class FriendRequestServiceTest {
         List<FriendRequest> myFriends = new ArrayList<>();
 
         when(securityUtil.getMemberIdByUserDetails()).thenReturn(member.getId());
-        when(friendRequestRepository.findFriends(member.getId())).thenReturn(myFriends);
+        when(friendRequestRepository.findMyFriends(member.getId())).thenReturn(myFriends);
 
         // when
         FriendsListResponse friendsListResponse = friendRequestService.myFriends();
 
         // then
         assertEquals(0, friendsListResponse.getFriends().size());
-        verify(friendRequestRepository, times(1)).findFriends(member.getId());
+        verify(friendRequestRepository, times(1)).findMyFriends(member.getId());
     }
 
     @Test
@@ -321,8 +307,6 @@ class FriendRequestServiceTest {
         friendRequest1.setId(1L);
         friendRequest1.setSender(friend1);
         friendRequest1.setReceiver(member);
-        friendRequest1.setSendMemberId(friend1.getUsername());
-        friendRequest1.setReceiveMemberId(member.getUsername());
         friendRequest1.setStatus(RequestStatus.PENDING);
 
         // sender -> friend2, receiver -> member
@@ -330,8 +314,6 @@ class FriendRequestServiceTest {
         friendRequest2.setId(2L);
         friendRequest2.setSender(friend2);
         friendRequest2.setReceiver(member);
-        friendRequest2.setSendMemberId(friend2.getUsername());
-        friendRequest2.setReceiveMemberId(member.getUsername());
         friendRequest2.setStatus(RequestStatus.PENDING);
 
         List<FriendRequest> myReceived = new ArrayList<>();
@@ -365,16 +347,12 @@ class FriendRequestServiceTest {
         friendRequest1.setId(1L);
         friendRequest1.setSender(member);
         friendRequest1.setReceiver(friend1);
-        friendRequest1.setSendMemberId(member.getUsername());
-        friendRequest1.setReceiveMemberId(friend1.getUsername());
         friendRequest1.setStatus(RequestStatus.PENDING);
 
         FriendRequest friendRequest2 = new FriendRequest(member, friend2);
         friendRequest2.setId(2L);
         friendRequest2.setSender(member);
         friendRequest2.setReceiver(friend2);
-        friendRequest2.setSendMemberId(member.getUsername());
-        friendRequest2.setReceiveMemberId(friend2.getUsername());
         friendRequest2.setStatus(RequestStatus.PENDING);
 
         List<FriendRequest> myRequests = new ArrayList<>();

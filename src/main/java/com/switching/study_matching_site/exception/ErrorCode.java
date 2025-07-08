@@ -54,7 +54,10 @@ public enum ErrorCode {
     JWT_TOKEN_MALFORMED(400, "J002","잘못된 형식의 JWT 토큰입니다."),
     JWT_TOKEN_EXPIRED(401, "J003","JWT 토큰이 만료되었습니다."),
     JWT_TOKEN_INVALID(403, "J004","JWT 토큰이 유효하지 않습니다."),
-    JWT_TOKEN_TAMPERED(403, "J005","JWT 토큰이 변조되었습니다.");
+    JWT_TOKEN_TAMPERED(403, "J005","JWT 토큰이 변조되었습니다."),
+
+    // DB LOCK
+    PESSIMISTIC_LOCK_FAILED(409, "L001", "현재 방에 참여 요청이 많습니다. 잠시 후 다시 시도해주세요.");
 
     private final String code;
     private final String message;

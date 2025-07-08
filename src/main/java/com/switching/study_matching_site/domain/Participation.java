@@ -50,6 +50,4 @@ public class Participation {
         member.setEnterStatus(EnterStatus.ENTER);
         room.setCurrentCount(room.getCurrentCount() + 1);
     }
-
-    
 }

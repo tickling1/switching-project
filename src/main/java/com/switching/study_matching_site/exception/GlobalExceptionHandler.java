@@ -1,6 +1,8 @@
 package com.switching.study_matching_site.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.dialect.lock.PessimisticEntityLockException;
+import org.hibernate.exception.LockTimeoutException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
@@ -40,4 +42,9 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.valueOf(e.getErrorCode().getStatus()));
     }
 
+    @ExceptionHandler({PessimisticEntityLockException.class, LockTimeoutException.class})
+    protected ResponseEntity<ErrorResponse> handlePessimisticEntityLockException() {
+        ErrorResponse errorResponse = ErrorResponse.of(ErrorCode.PESSIMISTIC_LOCK_FAILED);
+        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT); // 409 Conflict
+    }
 }

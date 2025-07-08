@@ -102,8 +102,6 @@ class RoomServiceTest {
         // given
         RoomCreateDto dto = new RoomCreateDto(
                 "자바 프로젝트 인원 모집",
-                RoomStatus.ON,
-                0,
                 6,
                 LocalTime.now(),
                 LocalTime.now().plusHours(3),
@@ -139,8 +137,6 @@ class RoomServiceTest {
         // given
         RoomCreateDto dto = new RoomCreateDto(
                 "자바 프로젝트 인원 모집",
-                RoomStatus.ON,
-                1,
                 6,
                 LocalTime.now(),
                 LocalTime.now().plusHours(3),
@@ -392,7 +388,7 @@ class RoomServiceTest {
 
         Participation participation = new Participation(room, RoleType.ADMIN, admin);
         when(securityUtil.getMemberByUserDetails()).thenReturn(user);
-        when(roomRepository.findById(any())).thenReturn(Optional.of(room));
+        when(roomRepository.findRoomIdActivity(any())).thenReturn(Optional.of(room));
 
         // when
         roomService.participateRoom(room.getId());
@@ -439,7 +435,7 @@ class RoomServiceTest {
 
         Participation participation = new Participation(room, RoleType.ADMIN, admin);
         when(securityUtil.getMemberByUserDetails()).thenReturn(user);
-        when(roomRepository.findById(any())).thenReturn(Optional.empty());
+        when(roomRepository.findRoomIdActivity(any())).thenReturn(Optional.empty());
 
         // when & then
         EntityNotFoundException ex = assertThrows(EntityNotFoundException.class, () -> roomService.participateRoom(room.getId()));
@@ -460,7 +456,7 @@ class RoomServiceTest {
 
         Participation participation = new Participation(room, RoleType.ADMIN, admin);
         when(securityUtil.getMemberByUserDetails()).thenReturn(user);
-        when(roomRepository.findById(any())).thenReturn(Optional.of(room));
+        when(roomRepository.findRoomIdActivity(any())).thenReturn(Optional.of(room));
 
         // when & then
         InvalidValueException ex = assertThrows(InvalidValueException.class, () -> roomService.participateRoom(room.getId()));

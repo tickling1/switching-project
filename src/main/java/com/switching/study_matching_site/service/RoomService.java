@@ -12,7 +12,10 @@ import com.switching.study_matching_site.exception.ErrorCode;
 import com.switching.study_matching_site.exception.InvalidValueException;
 import com.switching.study_matching_site.repository.ParticipationRepository;
 import com.switching.study_matching_site.repository.RoomRepository;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.dialect.lock.PessimisticEntityLockException;
+import org.hibernate.exception.LockTimeoutException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +34,7 @@ public class RoomService {
     private final ParticipationRepository participationRepository;
     private final RoomRepository roomRepository;
     private final SecurityUtil securityUtil;
+    private final EntityManager em;
 
     /**
      * 방 생성
@@ -102,16 +106,15 @@ public class RoomService {
     }
 
     /**
-     * 방 참여
+     * 방 참여 (synchronized) 로 해결
      * 이미 다른 방에 참여 하고 있다면 예외를 터트려야 함.
      * 들어가려는 방이 존재하지 않다면 예외를 터트려야 함.
      * 방을 참여한 후에는 멤버의 EnterStatus 가 Enter(참여) 으로 되어있어야 함.
      * (Participation을 생성하면 Enter 상태로 변환)
      * 동시성
      */
-    public void participateRoom(Long roomId) {
+    public synchronized void participateRoomWithSynchronized(Long roomId) {
         Member findMember = securityUtil.getMemberByUserDetails();
-
         // 회원이 다른 방에 이미 참여 중인지 확인
         isParticipationRoom(findMember);
 
@@ -121,6 +124,29 @@ public class RoomService {
 
         // 현재 방 인원이 설정된 방에 인원보다 같거나 많을 경우 예외 발생
         if (room.getCurrentCount() + 1 > room.getMaxCount()) throw new InvalidValueException(ErrorCode.ROOM_FULL);
+
+        // 위에 검증 로직이 모두 통과한다면 멤버에게 유저 권한을 주고
+        // EnterStatus(ENTER), participation_history(add) 추가, CurrentCount + 1 을 추가해줌
+        Participation participation = new Participation(room, RoleType.USER, findMember);
+
+        // 모든 로직이 정상적으로 종료되면 영속화
+        participationRepository.save(participation);
+        em.flush();
+    }
+
+    public void participateRoom(Long roomId) throws PessimisticEntityLockException, LockTimeoutException {
+        Member findMember = securityUtil.getMemberByUserDetails();
+        // 회원이 다른 방에 이미 참여 중인지 확인
+        isParticipationRoom(findMember);
+
+        // 방이 없다면 예외 발생
+        // + 방이 없고, 방 상태가 OFF 여야함.
+        Room room = roomRepository.findRoomIdActivity(roomId).orElseThrow(() -> new EntityNotFoundException(ErrorCode.ROOM_NOT_FOUND));
+
+        // 현재 방 인원이 설정된 방에 인원보다 같거나 많을 경우 예외 발생
+        if (room.getCurrentCount() + 1 > room.getMaxCount()) {
+            throw new InvalidValueException(ErrorCode.ROOM_FULL);
+        }
 
         // 위에 검증 로직이 모두 통과한다면 멤버에게 유저 권한을 주고
         // EnterStatus(ENTER), participation_history(add) 추가, CurrentCount + 1 을 추가해줌
@@ -176,7 +202,9 @@ public class RoomService {
     public void participateWithUUID(String uuid) {
         Member findMember = securityUtil.getMemberByUserDetails();
         isParticipationRoom(findMember);
+
         Room findRoom = roomRepository.findRoomByUuid(uuid).orElseThrow(() -> new EntityNotFoundException(ErrorCode.ROOM_NOT_FOUND));
+
         Participation participation = new Participation(findRoom, RoleType.USER, findMember);
         participation.setMember(findMember);
         participationRepository.save(participation);

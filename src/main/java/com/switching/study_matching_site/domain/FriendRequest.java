@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.switching.study_matching_site.domain.type.RequestStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 
 @Entity
 @Getter
@@ -19,14 +20,10 @@ public class FriendRequest {
     @JoinColumn(name = "SENDER_ID")
     private Member sender;
 
-    private String sendMemberId;
-
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "RECEIVER_ID")
     private Member receiver;
-
-    private String receiveMemberId;
 
     @Column(name = "REQUEST_STATUS")
     @Enumerated(EnumType.STRING)
@@ -36,8 +33,6 @@ public class FriendRequest {
     public FriendRequest(Member sender, Member receiver) {
         this.sender = sender;
         this.receiver = receiver;
-        this.sendMemberId = sender.getLoginId();
-        this.receiveMemberId = receiver.getLoginId();
         this.status = RequestStatus.PENDING;
     }
 
@@ -54,9 +49,8 @@ public class FriendRequest {
     @Override
     public String toString() {
         return "FriendRequest{" +
-                "id=" + id +
-                ", sendMember='" + sendMemberId + '\'' +
-                ", receiveMember='" + receiveMemberId + '\'' +
+                "sender=" + sender +
+                ", receiver=" + receiver +
                 ", status=" + status +
                 '}';
     }

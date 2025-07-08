@@ -1,5 +1,6 @@
 package com.switching.study_matching_site;
 
+import com.switching.study_matching_site.domain.FriendRequest;
 import com.switching.study_matching_site.domain.Member;
 import com.switching.study_matching_site.domain.Participation;
 import com.switching.study_matching_site.domain.Room;
@@ -7,6 +8,7 @@ import com.switching.study_matching_site.domain.type.*;
 import com.switching.study_matching_site.dto.member.MemberCreateDto;
 import com.switching.study_matching_site.dto.room.RoomCreateDto;
 import com.switching.study_matching_site.jwt.JWTUtil;
+import com.switching.study_matching_site.repository.FriendRequestRepository;
 import com.switching.study_matching_site.repository.MemberRepository;
 import com.switching.study_matching_site.repository.ParticipationRepository;
 import com.switching.study_matching_site.repository.RoomRepository;
@@ -22,16 +24,14 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Component
-@Profile("dev")
+@Profile("test")
+// @Profile("dev")
 @RequiredArgsConstructor
 public class DevInitializer implements CommandLineRunner {
 
     private final MemberService memberService;
     private final ParticipationRepository participationRepository;
-    private final RoomSearchService roomSearchService;
-    private final MatchingService matchingService;
-    private final RoomService roomService;
-    private final ProfileService profileService;
+    private final FriendRequestRepository friendRequestRepository;
     private final RoomRepository roomRepository;
     private final MemberRepository memberRepository;
 
@@ -49,7 +49,7 @@ public class DevInitializer implements CommandLineRunner {
         roomRepository.save(room2);
 
         // 초기 데이터 세팅
-        for (int i = 1; i <= 10; i++) {
+        for (int i = 1; i <= 25; i++) {
 
             MemberCreateDto memberDto = new MemberCreateDto(
                     "loginId" + i,
@@ -64,6 +64,10 @@ public class DevInitializer implements CommandLineRunner {
             Long memberId = memberService.joinMember(memberDto);
             Member member = memberRepository.findById(memberId).get();
 
+            if (i > 10) {
+                continue;
+            }
+
             if (i % 2 == 0) {
                 Participation participation = new Participation(room, RoleType.USER, member);
                 participationRepository.save(participation);
@@ -71,6 +75,27 @@ public class DevInitializer implements CommandLineRunner {
                 Participation participation = new Participation(room2, RoleType.USER, member);
                 participationRepository.save(participation);
             }
+        }
+
+        // N + 1 문제 확인
+        for (int i = 2; i <= 21; i++) {
+
+            // if (i >= 13) {
+                // 친구 신청만
+                Member member = memberRepository.findById(1L).get();
+                Member otherMember = memberRepository.findById(Long.valueOf(i)).get();
+                FriendRequest friendRequest = new FriendRequest(member, otherMember);
+
+                friendRequestRepository.save(friendRequest);
+            //}
+            /*else {
+                // 친구 관계 설정
+                Member member = memberRepository.findById(1L).get();
+                Member otherMember = memberRepository.findById(Long.valueOf(i)).get();
+                FriendRequest friendRequest = new FriendRequest(member, otherMember);
+                friendRequest.setStatus(RequestStatus.ACCEPTED);
+                friendRequestRepository.save(friendRequest);
+            }*/
         }
     }
 
