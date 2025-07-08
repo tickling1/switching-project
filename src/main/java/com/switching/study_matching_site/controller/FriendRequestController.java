@@ -1,5 +1,7 @@
 package com.switching.study_matching_site.controller;
 
+import com.switching.study_matching_site.dto.friend.FriendRequestDto;
+import com.switching.study_matching_site.dto.friend.FriendRequestReceiverDto;
 import com.switching.study_matching_site.dto.friend.FriendRequestResponse;
 import com.switching.study_matching_site.dto.friend.FriendsListResponse;
 import com.switching.study_matching_site.service.FriendRequestService;
@@ -14,6 +16,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Tag(name = "FRIEND-REQUEST", description = "친구 요청 API")
 @RestController
@@ -99,6 +103,12 @@ public class FriendRequestController {
     public ResponseEntity<FriendsListResponse> getFriendRequests() {
         FriendsListResponse friendsListResponse = friendRequestService.myRequests();
         return ResponseEntity.status(HttpStatus.OK).body(friendsListResponse);
+    }
+
+    @GetMapping("/friends/requests2")
+    public ResponseEntity<List<FriendRequestReceiverDto>> getFriendRequests2() {
+        List<FriendRequestReceiverDto> friendRequestReceiverDtos = friendRequestService.myRequests2();
+        return ResponseEntity.status(HttpStatus.OK).body(friendRequestReceiverDtos);
     }
 
     // 내가 받은 친구 요청 목록 보기

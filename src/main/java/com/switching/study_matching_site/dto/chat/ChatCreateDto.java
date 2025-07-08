@@ -4,12 +4,14 @@ import com.switching.study_matching_site.domain.Chat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Setter
 @Getter
+@NoArgsConstructor
 @AllArgsConstructor
 @Schema(description = "채팅 요청 DTO")
 public class ChatCreateDto {

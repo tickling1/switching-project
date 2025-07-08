@@ -4,6 +4,7 @@ import com.switching.study_matching_site.StudyMatchingSiteApplication;
 import com.switching.study_matching_site.domain.Member;
 import com.switching.study_matching_site.domain.Participation;
 import com.switching.study_matching_site.domain.Room;
+import com.switching.study_matching_site.domain.type.RoleType;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +13,9 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @SpringBootTest
-@ActiveProfiles("test")
 @Transactional
 public class testNPlusOneProblemTest {
 
@@ -34,20 +36,15 @@ public class testNPlusOneProblemTest {
         // 1. 방(Room) 생성
         Room room = new Room();
         room.setRoomTitle("Test Room");
+        room.setCurrentCount(0);
         roomRepository.save(room);
-        // 2. 참여자(Panticipation) 10명 생성 및 저장
 
-        for (int i= 1; i <= 10; i++) {
-            // 2.1 회원(Member) 생성
+        for (int i = 0; i < 5; i++) {
             Member member = new Member();
             member.setUsername ("member" + i);
             memberRepository.save (member);
 
-
-            // 2.2 참여(Participation) 생성
-            Participation participation = new Participation();
-            participation.setRoom(room); // 해당 방에 참여
-            participation.setMember(member); // 회원 설정
+            Participation participation = new Participation(room, RoleType.ADMIN, member);
             participationRepository.save(participation);
         }
 
@@ -56,15 +53,51 @@ public class testNPlusOneProblemTest {
 
         System.out.println(". ----------------------------");
 
-        // 3. ROOm을 조회하고 연관된 Pantacapataon들을 조회하여 N+1 문제를 발생시킨다.!
-        // 여기서 room.getParticipation_history()를 반복문을 통해 접근
         Room findRoom = roomRepository.findById(room.getId()).orElseThrow() ;
         System.out.println(". ----------------------------");
+        System.out.println("findRoom = " + findRoom.getParticipation_history().getClass());
+        System.out.println(". ----------------------------");
 
+        // 컬렉션 LAZY 일 경우, findRoom.getParticipation_history() 에서 where r.id = ? 이라는 쿼리가 나감
+        for (Participation p : findRoom.getParticipation_history()) {
+            System.out.println("username = " + p.getJoinDate());
+        }
+    }
 
-        // N+1 문제 발생: Room을 가져오고, 연관된 Pacticration들을 반복문을 통해 조회
-        for (Participation participation : findRoom.getParticipation_history()) {
-            System.out.println("Participation ID: " + participation.getId() + ", Member ID: "+ participation.getMember().getId());
+    @Test
+    void nPlusOneProblem() {
+        // Room 1개
+        Room room = new Room();
+        room.setCurrentCount(0);
+        room.setRoomTitle("Test Room");
+        roomRepository.save(room);
+
+        // Member 5명 & Participation 5개
+        for (int i = 0; i < 5; i++) {
+            Member member = new Member();
+            member.setUsername("member" + i);
+            memberRepository.save(member);
+
+            Participation participation = new Participation(room, RoleType.USER, member);
+            participationRepository.save(participation);
+        }
+
+        em.flush();
+        em.clear();
+        System.out.println("----- 영속성 컨텍스트 정리 -----");
+        // 쿼리 1번: Room 조회
+        Room findRoom = roomRepository.findById(room.getId()).orElseThrow();
+
+        // 쿼리 1번: Participation 리스트 조회 (LAZY 로딩 때문에 아직 쿼리 안 나감)
+        // 처음에 Room을 조회할 때는 participation_history는 초기화되지 않고 프록시 객체(PersistentBag 등)로 남아 있음.
+        // 하지만 프록시가 실제로 사용되는 시점, 이런 식으로 컬렉션 내부에 접근하는 순간, Hibernate가 해당 Room의 Participation 리스트를 한 번의 쿼리로 DB에서 조회함
+        List<Participation> list = findRoom.getParticipation_history();
+
+        System.out.println("----- N+1 문제 발생 구간 -----");
+
+        // 여기서 N = Participation 수 만큼 추가 쿼리 발생(방에서 참여하고 있는 혹은 방에서 참여했던 회원들의 멤버를 가져올 떄)
+        for (Participation p : list) {
+            System.out.println("username = " + p.getMember().getUsername());  // ← 여기서 N개의 쿼리 발생
         }
     }
 }

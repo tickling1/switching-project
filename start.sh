@@ -10,7 +10,7 @@ LOG_PATH=/home/ubuntu/app/logs
 S3_BUCKET=switching-bucket-202504
 S3_KEY=app.zip
 
-PORT_A=9090
+PORT_A=9090ㅎ
 PORT_B=9091
 HEALTH_CHECK_PATH=/actuator/health
 

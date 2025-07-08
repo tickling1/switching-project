@@ -105,24 +105,6 @@ public class Room extends BaseTimeEntity{
         this.getParticipation_history().clear();
     }
 
-    public void leaveRoomMember(Member member) {
-        Participation targetParticipation = null;
-
-        for (Participation p : this.participation_history) {
-            if (p.getMember().equals(member)) {
-                targetParticipation = p;
-                break;
-            }
-        }
-
-        if (targetParticipation != null) {
-            // 참여자 상태 변경
-            targetParticipation.setLeaveDate(LocalDateTime.now());
-            member.setEnterStatus(EnterStatus.OUT);
-            this.setCurrentCount(this.getCurrentCount() - 1);
-        }
-    }
-
     public void addNotice(Notice notice) {
         this.notice_history.add(notice);
         notice.setRoom(this);

@@ -55,7 +55,7 @@ public class ProfileController {
 
     @Parameter(name = "profileId", description = "프로필 ID", in = ParameterIn.PATH)
     @GetMapping("/profile/{profileId}")
-    public String read( @PathVariable Long profileId) {
+    public String read(@PathVariable Long profileId) {
         return profileService.readProfile(profileId).toString();
     }
 

@@ -86,8 +86,8 @@ class MemberServiceTest {
          * "어떤 email로 조회하든 항상 멤버가 없다고 가정"
          */
         // given
-        when(memberRepository.findByLoginId(any())).thenReturn(Optional.of(new Member()));
-        when(memberRepository.findByEmail(any())).thenReturn(Optional.empty());
+        when(memberRepository.existsByLoginId(any())).thenReturn(true);
+        when(memberRepository.existsByEmail(any())).thenReturn(false);
 
         MemberCreateDto dto = getMemberCreateDto();
 
@@ -105,7 +105,7 @@ class MemberServiceTest {
          * "어떤 loginId로 조회하든 항상 멤버가 없다고 가정"
          */
         // given
-        when(memberRepository.findByEmail(any())).thenReturn(Optional.of(new Member()));
+        when(memberRepository.existsByEmail(any())).thenReturn(true);
         when(memberRepository.findByLoginId(any())).thenReturn(Optional.empty());
         MemberCreateDto dto = getMemberCreateDto();
 
@@ -123,6 +123,8 @@ class MemberServiceTest {
         // 회원 생성용 Member 객체를 직접 생성하고 ID를 수동으로 설정
         Member member = getMemberCreateDto().toEntity();
         member.setId(100L);
+
+        when(securityUtil.getMemberByUserDetails()).thenReturn(member);
 
         // memberRepository.findById(100L) 이 호출되면 위에서 만든 member 를 반환하도록 설정
         when(memberRepository.findById(100L)).thenReturn(Optional.of(member));
@@ -144,7 +146,7 @@ class MemberServiceTest {
         assertEquals("testMember", member.getUsername());
 
         // 실제 서비스 메서드 호출: ID 100번 회원의 정보를 dto 값으로 업데이트
-        memberService.updateMember(100L, dto);
+        memberService.updateMember(dto);
 
         // then
 
@@ -168,7 +170,8 @@ class MemberServiceTest {
         Member member = getMemberCreateDto().toEntity();
         member.setId(100L);
 
-        when(memberRepository.findByEmail(any())).thenReturn(Optional.of(new Member()));
+        when(securityUtil.getMemberByUserDetails()).thenReturn(member);
+        when(memberRepository.existsByEmail(any())).thenReturn(true);
 
         // memberRepository.findById(100L) 이 호출되면 위에서 만든 member 를 반환하도록 설정
         when(memberRepository.findById(100L)).thenReturn(Optional.of(member));
@@ -181,7 +184,7 @@ class MemberServiceTest {
                 "010-2222-3333"
         );
 
-        assertThrows(InvalidValueException.class, () -> memberService.updateMember(100L, dto));
+        assertThrows(InvalidValueException.class, () -> memberService.updateMember(dto));
 
     }
 
@@ -194,18 +197,19 @@ class MemberServiceTest {
                     return member;
                 }
         );
+        when(securityUtil.getMemberIdByUserDetails()).thenReturn(100L);
         memberService.joinMember(getMemberCreateDto());
         ArgumentCaptor<Member> captor = ArgumentCaptor.forClass(Member.class);
         verify(memberRepository).save(captor.capture());
         Member savedMember = captor.getValue();
 
-        memberService.leaveMember(savedMember.getId());
+        memberService.leaveMember();
         verify(memberRepository, times(1)).deleteById(savedMember.getId());
 
     }
 
     @Test
-    void 내_정보_보기() {
+    void 내_정보_보기_성공() {
         Member member = new Member();
         member.setId(100L);
         member.setLoginId("kqk1234");
@@ -214,33 +218,12 @@ class MemberServiceTest {
         member.setPhoneNumber("010-2222-3333");
         member.setUsername("testMember");
 
-        when(securityUtil.getMemberIdByUserDetails()).thenReturn(100L);
-        when(memberRepository.findById(any())).thenReturn(Optional.of(member));
-
-        MemberReadDto memberReadDto = memberService.myInfo(100L);
-        verify(memberRepository).findById(100L);
+        when(securityUtil.getMemberByUserDetails()).thenReturn(member);
+        MemberReadDto memberReadDto = memberService.myInfo();
 
         assertEquals("testMember", memberReadDto.getUsername());
         assertEquals("010-2222-3333", memberReadDto.getPhoneNumber());
         assertEquals("xuni1234@gmail.com", memberReadDto.getEmail());
 
     }
-    @Test
-    void 상대_정보_보기_실패() {
-        Member member = new Member();
-        member.setId(100L);
-        member.setLoginId("kqk1234");
-        member.setPassword("dqwjfir!");
-        member.setEmail("xuni1234@gmail.com");
-        member.setPhoneNumber("010-2222-3333");
-        member.setUsername("testMember");
-
-        when(securityUtil.getMemberIdByUserDetails()).thenReturn(1L);
-        when(memberRepository.findById(any())).thenReturn(Optional.of(member));
-
-        InvalidValueException exception = assertThrows(InvalidValueException.class, () -> memberService.myInfo(100L));
-        assertEquals(exception.getErrorCode(), ErrorCode.ACCESS_DENIED);
-
-    }
-
 }

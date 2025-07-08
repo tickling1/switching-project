@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,22 +36,10 @@ public class MemberController {
                             )
                     )
             })
-    @GetMapping("/members/{memberId}")
-    public String membersInfo(@Parameter(description = "members의 id", in = ParameterIn.PATH)
-                                  @PathVariable(name = "memberId") Long memberId) {
-
-        /* // Header에서 loginId 를 가져옴
-        String loginId = SecurityContextHolder.getContext().getAuthentication().getName();
-        
-        Long findMemberId = memberService.findMemberId(loginId);
-        System.out.println("security loginId = " + loginId);*/
-
-        /*if (!findMemberId.equals(memberId)) {
-            return "잘못된 사용자 접근입니다.";
-        }
-*/
-        MemberReadDto memberReadDto = memberService.myInfo(memberId);
-        return memberReadDto.toString();
+    @GetMapping("/members")
+    public ResponseEntity<MemberReadDto> membersInfo() {
+        MemberReadDto memberReadDto = memberService.myInfo();
+        return ResponseEntity.ok().body(memberReadDto);
     }
 
     @Operation(summary = "회원 등록", description = "회원을 등록합니다.",
@@ -60,10 +49,11 @@ public class MemberController {
                             description = "회원 등록 성공"
                     )
             })
-    @PostMapping("/members")
-    public String signMember(@RequestBody @Validated MemberCreateDto memberCreateDto) {
+
+    @PostMapping("/members/signup")
+    public ResponseEntity<Void> signMember(@RequestBody @Validated MemberCreateDto memberCreateDto) {
         Long signMemberId = memberService.joinMember(memberCreateDto);
-        return signMemberId.toString();
+        return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "회원 탈퇴", description = "회원을 탈퇴합니다.",
@@ -73,25 +63,28 @@ public class MemberController {
                             description = "회원 탈퇴 성공"
                     )
             })
-    @DeleteMapping("/members/{memberId}")
-    public String deleteMember(@Parameter(description = "members의 id", in = ParameterIn.PATH)
-                                   @PathVariable(name = "memberId") Long memberId) {
-        memberService.leaveMember(memberId);
-        return "탈퇴 완료";
+    @DeleteMapping("/members")
+    public ResponseEntity<Void> deleteMember() {
+        memberService.leaveMember();
+        return ResponseEntity.ok().build();
     }
+
 
     @Operation(summary = "회원 수정", description = "회원정보를 수정합니다.",
             responses = {
                     @ApiResponse(
                             responseCode = "200",
-                            description = "회원정보 수정 성공"
+                            description = "회원정보 수정 성공",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = MemberUpdateDto.class)
+                            )
                     )
             })
-    @PutMapping("/members/{memberId}")
-    public String updateMember(@Parameter(description = "members의 id")
-                                   @PathVariable(name = "memberId") Long memberId,
-                               @RequestBody MemberUpdateDto memberUpdateDto) {
-        memberService.updateMember(memberId, memberUpdateDto);
-        return "수정 완료";
+    @PutMapping("/members")
+    @Parameter(description = "")
+    public ResponseEntity<Void> updateMember(@RequestBody MemberUpdateDto memberUpdateDto) {
+        memberService.updateMember(memberUpdateDto);
+        return ResponseEntity.ok().build();
     }
 }

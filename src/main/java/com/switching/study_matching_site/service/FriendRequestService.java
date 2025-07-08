@@ -4,6 +4,7 @@ import com.switching.study_matching_site.SecurityUtil;
 import com.switching.study_matching_site.domain.FriendRequest;
 import com.switching.study_matching_site.domain.Member;
 import com.switching.study_matching_site.domain.type.RequestStatus;
+import com.switching.study_matching_site.dto.friend.FriendRequestReceiverDto;
 import com.switching.study_matching_site.dto.friend.FriendRequestResponse;
 import com.switching.study_matching_site.dto.friend.FriendsListResponse;
 import com.switching.study_matching_site.exception.EntityNotFoundException;
@@ -27,7 +28,6 @@ public class FriendRequestService {
     private final FriendRequestRepository friendRequestRepository;
     private final MemberRepository memberRepository;
     private final SecurityUtil securityUtil;
-
 
     /**
      * 친구 신청 보내기
@@ -70,7 +70,7 @@ public class FriendRequestService {
         return new FriendRequestResponse(
                 sender.getId(),
                 receiverId,
-                RequestStatus.PENDING
+                newRequest.getStatus()
         );
     }
 
@@ -128,32 +128,35 @@ public class FriendRequestService {
     /**
      * 친구 목록 조회
      * 친구 상태의 전체 목록을 조회해옵니다.
+     * N+1 문제 발견
      */
     @Transactional(readOnly = true)
     public FriendsListResponse myFriends() {
-            Long memberId = securityUtil.getMemberIdByUserDetails();
-            List<FriendRequest> friends = friendRequestRepository.findFriends(memberId);
-            FriendsListResponse response = new FriendsListResponse();
+        Long memberId = securityUtil.getMemberIdByUserDetails();
+        List<FriendRequest> friendRequests = friendRequestRepository.findMyFriends(memberId);
+        FriendsListResponse response = new FriendsListResponse();
 
-        for (FriendRequest friend : friends) {
-            Member other;
-            if (friend.getReceiver() != null && friend.getReceiver().getId().equals(memberId)) {
-                other = friend.getSender();
+        for (FriendRequest friendRequest : friendRequests) {
+            Member friend;
+            // 내가 받은 요청일 경우에는 "보낸 이"를 가져와야함
+            if (friendRequest.getReceiver() != null && friendRequest.getReceiver().getId().equals(memberId)) {
+                friend = friendRequest.getSender();
             } else {
-                other = friend.getReceiver();
+                // 내가 보낸 요청일 경우에는 "받은 이"를 가져와야함
+                friend = friendRequest.getReceiver();
             }
 
-            if (other != null) {
-                response.getFriends().put(other.getId(), other.getUsername());
+            if (friend != null) {
+                response.getFriends().put(friend.getId(), friend.getUsername());
             }
         }
         return response;
-
     }
 
     /**
      * 내가 받은 친구 요청 목록
      * 친구 상태가 대기 중인 받은 요청 목록을 불러옵니다.
+     * N+1 문제 발견
      */
     @Transactional(readOnly = true)
     public FriendsListResponse myReceived() {
@@ -173,6 +176,7 @@ public class FriendRequestService {
     /**
      * 내 친구 요청 목록
      * 친구 상태가 대기 중인 보낸 요청 목록을 불러옵니다.
+     * N+1 문제 발생
      */
     @Transactional(readOnly = true)
     public FriendsListResponse myRequests() {
@@ -183,9 +187,17 @@ public class FriendRequestService {
         for (FriendRequest request : requests) {
             Member receiver = request.getReceiver();
             if (receiver != null) {
-                response.getFriends().put(receiver.getId(), receiver.getUsername());
+                response.getFriends().put(receiver.getId(), receiver.getUsername()); // N+1 문제 발생!
             }
         }
+        return response;
+    }
+
+    @Transactional(readOnly = true)
+    public List<FriendRequestReceiverDto> myRequests2() {
+        Long senderId = securityUtil.getMemberIdByUserDetails();
+        List<FriendRequestReceiverDto> response = friendRequestRepository.findMyRequestDtos(senderId);
+
         return response;
     }
 

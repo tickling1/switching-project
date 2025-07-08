@@ -27,7 +27,7 @@ public class LoginController {
     private final LoginService loginService;
 
     @Operation(summary = "리프레쉬 토큰을 생성합니다.", description = "만료된 리프레쉬 토큰을 재성성 합니다.")
-    @PostMapping("/reissue")
+    @PostMapping("/members/logout")
     public ResponseEntity<?> reissue(HttpServletRequest request, HttpServletResponse response) {
          return loginService.getRefreshToken(request, response);
     }
@@ -45,9 +45,9 @@ public class LoginController {
                             )
                     )
             })
-    @PostMapping("/login")
-    public ResponseEntity<TokenResponse> loginMember(@RequestBody LoginRequestDto loginRequestDto) {
-        ResponseEntity<TokenResponse> responses = loginService.login(loginRequestDto);
+    @PostMapping("/members/login")
+    public ResponseEntity<TokenResponse> loginMember(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse response) {
+        ResponseEntity<TokenResponse> responses = loginService.login(loginRequestDto, response);
         return responses;
     }
 }

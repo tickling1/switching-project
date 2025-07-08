@@ -9,15 +9,22 @@ spring:
     username: "sa"
     driver-class-name: org.h2.Driver
 
+  jwt:
+    secret: "my-very-strong-secret-key-that-is-long-enough-1234567890"
+
   jpa:
     hibernate:
       ddl-auto: create
     properties:
+      javax.persistence.lock.timeout: 3000 # 밀리초 단위, 3초
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect
-        # show_sql: true
-        format_sql: true
+        show_sql: false
+        format_sql: false
 
+logging.level:
+  org.hibernate.SQL: OFF
+  org.hibernate.type.descriptor.sql.BasicBinder: OFF
 
 custom:
   secret:
