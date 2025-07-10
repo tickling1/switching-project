@@ -19,6 +19,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -478,9 +479,9 @@ class RoomServiceTest {
         Participation participation = new Participation(room, RoleType.ADMIN, admin);
         Participation participation2 = new Participation(room, RoleType.USER, user);
 
-        when(roomRepository.findById(any())).thenReturn(Optional.of(room));
+        when(roomRepository.findByIdWithLock(any())).thenReturn(Optional.of(room));
         when(securityUtil.getMemberByUserDetails()).thenReturn(user);
-        when(participationRepository.findByRoomAndMember(room.getId(), user.getId())).thenReturn(Optional.of(participation2));
+        when(participationRepository.findByRoomAndMemberWithLock(room.getId(), user.getId())).thenReturn(Optional.of(participation2));
 
         // when
         roomService.leaveRoom(room.getId());
@@ -504,9 +505,10 @@ class RoomServiceTest {
         Participation participation = new Participation(room, RoleType.ADMIN, admin);
         Participation participation2 = new Participation(room, RoleType.USER, user);
 
-        when(roomRepository.findById(any())).thenReturn(Optional.of(room));
+        when(roomRepository.findByIdWithLock(any())).thenReturn(Optional.of(room));
         when(securityUtil.getMemberByUserDetails()).thenReturn(admin);
-        when(participationRepository.findByRoomAndMember(room.getId(), admin.getId())).thenReturn(Optional.of(participation2));
+        when(participationRepository.findByRoomAndMemberWithLock(room.getId(), admin.getId())).thenReturn(Optional.of(participation));
+        when(participationRepository.findHandOverCandidates(room.getId(), admin.getId())).thenReturn(List.of(participation2));
 
         // when
         roomService.leaveRoom(room.getId());
@@ -527,9 +529,9 @@ class RoomServiceTest {
         Member admin = createMember();
 
         Participation participation = new Participation(room, RoleType.ADMIN, admin);
-        when(roomRepository.findById(any())).thenReturn(Optional.of(room));
+        when(roomRepository.findByIdWithLock(any())).thenReturn(Optional.of(room));
         when(securityUtil.getMemberByUserDetails()).thenReturn(admin);
-        when(participationRepository.findByRoomAndMember(room.getId(), admin.getId())).thenReturn(Optional.of(participation));
+        when(participationRepository.findByRoomAndMemberWithLock(room.getId(), admin.getId())).thenReturn(Optional.of(participation));
 
         // when
         roomService.leaveRoom(room.getId());
@@ -551,7 +553,7 @@ class RoomServiceTest {
 
         Participation participation = new Participation(room, RoleType.ADMIN, admin);
         when(securityUtil.getMemberByUserDetails()).thenReturn(admin);
-        when(roomRepository.findById(any())).thenReturn(Optional.empty());
+        when(roomRepository.findByIdWithLock(any())).thenReturn(Optional.empty());
 
         // when & then
         EntityNotFoundException ex = assertThrows(EntityNotFoundException.class, () -> roomService.leaveRoom(room.getId()));
@@ -568,7 +570,7 @@ class RoomServiceTest {
 
         Participation participation = new Participation(room, RoleType.ADMIN, admin);
         when(securityUtil.getMemberByUserDetails()).thenReturn(admin);
-        when(roomRepository.findById(any())).thenReturn(Optional.of(room));
+        when(roomRepository.findByIdWithLock(any())).thenReturn(Optional.of(room));
 
         // when & then
         EntityNotFoundException ex = assertThrows(EntityNotFoundException.class, () -> roomService.leaveRoom(room.getId()));
