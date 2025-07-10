@@ -23,7 +23,7 @@ jobs:
 
       - name: Build with Gradle (prod profile)
         run: ./gradlew clean build -Dspring.profiles.active=prod
-        
+
       - name: Generate JaCoCo Test Coverage Report
         run: ./gradlew jacocoTestReport
 
