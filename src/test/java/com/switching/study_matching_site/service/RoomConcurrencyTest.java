@@ -30,6 +30,8 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.reactive.TransactionSynchronization;
+import org.springframework.transaction.reactive.TransactionSynchronizationManager;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -57,7 +59,6 @@ public class RoomConcurrencyTest {
     private static final int THREAD_COUNT = 10;
 
     private Room testRoom;
-
 
     @BeforeEach
     void setUp() {
@@ -106,7 +107,7 @@ public class RoomConcurrencyTest {
                     return true;
                 } catch (InvalidValueException e) {
                     System.out.println(memberId + "번 회원 입장 실패: " + e.getMessage());
-                }
+                    }
                 return false;
             });
         }

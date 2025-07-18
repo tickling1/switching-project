@@ -24,6 +24,9 @@ public interface RoomRepository extends JpaRepository<Room, Long>, RoomRepositor
     @Query("SELECT r FROM Room r WHERE r.id =:roomId AND r.roomStatus='ON'")
     Optional<Room> findRoomIdActivity(@Param("roomId") Long roomId);
 
+    @Query("SELECT r FROM Room r WHERE r.id =:roomId AND r.roomStatus='ON'")
+    Optional<Room> findRoomIdActivity2(@Param("roomId") Long roomId);
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT r FROM Room r WHERE r.id = :roomId")
     @QueryHints({@QueryHint(name = "javax.persistence.lock.timeout", value = "3000")})

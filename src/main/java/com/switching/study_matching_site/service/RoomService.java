@@ -18,6 +18,7 @@ import org.hibernate.dialect.lock.PessimisticEntityLockException;
 import org.hibernate.exception.LockTimeoutException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.reactive.TransactionSynchronization;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -112,6 +113,7 @@ public class RoomService {
      * 방을 참여한 후에는 멤버의 EnterStatus 가 Enter(참여) 으로 되어있어야 함.
      * (Participation을 생성하면 Enter 상태로 변환)
      */
+    @Transactional
     public synchronized void participateRoomWithSynchronized(Long roomId) {
         Member findMember = securityUtil.getMemberByUserDetails();
         // 회원이 다른 방에 이미 참여 중인지 확인
@@ -119,7 +121,7 @@ public class RoomService {
 
         // 방이 없다면 예외 발생
         // + 방이 없고, 방 상태가 OFF 여야함.
-        Room room = roomRepository.findRoomIdActivity(roomId).orElseThrow(() -> new EntityNotFoundException(ErrorCode.ROOM_NOT_FOUND));
+        Room room = roomRepository.findRoomIdActivity2(roomId).orElseThrow(() -> new EntityNotFoundException(ErrorCode.ROOM_NOT_FOUND));
 
         // 현재 방 인원이 설정된 방에 인원보다 같거나 많을 경우 예외 발생
         if (room.getCurrentCount() + 1 > room.getMaxCount()) throw new InvalidValueException(ErrorCode.ROOM_FULL);
