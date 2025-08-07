@@ -86,10 +86,10 @@ else
 fi
 
 # -----------------------
-# 새 서버 실행
+# 새 서버 실행 (prod 프로파일 포함)
 # -----------------------
 echo "🚀 새 서버를 포트 $IDLE_PORT 로 시작합니다..."
-nohup java -jar -Dserver.port=$IDLE_PORT $DEPLOY_PATH/$JAR_NAME > $LOG_PATH/nohup_$IDLE_PORT.out 2>&1 &
+nohup java -jar -Dspring.profiles.active=prod -Dserver.port=$IDLE_PORT $DEPLOY_PATH/$JAR_NAME > $LOG_PATH/nohup_$IDLE_PORT.out 2>&1 &
 
 # -----------------------
 # 헬스체크
@@ -107,20 +107,16 @@ do
     # -----------------------
     echo "🔀 Nginx 업스트림 서버 포트 변경 중..."
 
-    # 기존 포트가 9090이면 9091로, 아니면 9090으로 변경
     if grep -q "server 127.0.0.1:9090" /etc/nginx/sites-available/default; then
-      # 9090은 주석처리, 9091은 주석 해제
       sudo sed -i 's/^#server 127.0.0.1:9091/server 127.0.0.1:9091/' /etc/nginx/sites-available/default
       sudo sed -i 's/^server 127.0.0.1:9090/#server 127.0.0.1:9090/' /etc/nginx/sites-available/default
       echo "⚡ Nginx 업스트림을 9091로 변경"
     else
-      # 9091은 주석처리, 9090은 주석 해제
       sudo sed -i 's/^#server 127.0.0.1:9090/server 127.0.0.1:9090/' /etc/nginx/sites-available/default
       sudo sed -i 's/^server 127.0.0.1:9091/#server 127.0.0.1:9091/' /etc/nginx/sites-available/default
       echo "⚡ Nginx 업스트림을 9090으로 변경"
     fi
 
-    # Nginx 재시작
     sudo nginx -s reload
     echo "✅ Nginx 재시작 완료"
 
