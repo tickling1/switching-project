@@ -44,8 +44,6 @@ public class SecurityUtil {
             memberId = principal.getMemberId();
         }
         System.out.println("memberId from principal: " + memberId);
-
         return memberId;
     }
-
 }

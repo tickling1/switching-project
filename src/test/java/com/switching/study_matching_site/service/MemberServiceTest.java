@@ -118,6 +118,22 @@ class MemberServiceTest {
     }
 
     @Test
+    void 중복_전화번호_회원_생성_실패() {
+        // given
+        when(memberRepository.existsByPhoneNumber(any())).thenReturn(true);
+        when(memberRepository.existsByLoginId(any())).thenReturn(false);
+        when(memberRepository.existsByEmail(any())).thenReturn(false);
+
+        MemberCreateDto dto = getMemberCreateDto();
+
+        // when & then
+        InvalidValueException ex = assertThrows(InvalidValueException.class, () -> memberService.joinMember(dto));
+        assertEquals(ErrorCode.PHONE_NUM_DUPLICATION, ex.getErrorCode());
+
+        verify(memberRepository, never()).save(any());
+    }
+
+    @Test
     void 회원_정보_수정_성공() {
         // given
         // 회원 생성용 Member 객체를 직접 생성하고 ID를 수동으로 설정
@@ -161,6 +177,27 @@ class MemberServiceTest {
     }
 
     @Test
+    void 회원_정보_수정_아무것도_없으면_변경_안됨() {
+        // given
+        Member member = getMemberCreateDto().toEntity();
+        member.setId(100L);
+
+        when(securityUtil.getMemberByUserDetails()).thenReturn(member);
+
+        MemberUpdateDto dto = new MemberUpdateDto(null, null, null, null);
+
+        // when
+        memberService.updateMember(dto);
+
+        // then
+        assertEquals("testMember", member.getUsername());
+        assertEquals("dqwjfir!", member.getPassword());
+        assertEquals("xuni1234@gmail.com", member.getEmail());
+        assertEquals("010-1111-1111", member.getPhoneNumber());
+    }
+
+
+    @Test
     void 회원_정보_중복_이메일_수정_실패() {
         /**
          * 이메일을 수정하려고 하는데 이미 있는 이메일일 경우 실패해야 함.
@@ -186,6 +223,27 @@ class MemberServiceTest {
 
         assertThrows(InvalidValueException.class, () -> memberService.updateMember(dto));
 
+    }
+
+    @Test
+    void 회원_정보_중복_전화번호_수정_실패() {
+        // given
+        Member member = getMemberCreateDto().toEntity();
+        member.setId(100L);
+        when(securityUtil.getMemberByUserDetails()).thenReturn(member);
+        when(memberRepository.existsByPhoneNumber(any())).thenReturn(true);
+
+        MemberUpdateDto dto = new MemberUpdateDto(
+                "newName",
+                null,
+                null,
+                "010-9999-9999"
+        );
+
+        // when & then
+        InvalidValueException exception = assertThrows(InvalidValueException.class,
+                () -> memberService.updateMember(dto));
+        assertEquals(ErrorCode.PHONE_NUM_DUPLICATION, exception.getErrorCode());
     }
 
     @Test

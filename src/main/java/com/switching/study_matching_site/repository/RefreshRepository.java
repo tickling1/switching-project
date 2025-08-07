@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 public interface RefreshRepository extends JpaRepository<Refresh, Long> {
 
     Boolean existsByRefresh(String refresh);
-
-    @Transactional
-    void deleteByRefresh(String refresh);
+    long deleteByRefresh(String refresh); // 삭제된 row 수 반환
+    void deleteByLoginId(String loginId);
 }

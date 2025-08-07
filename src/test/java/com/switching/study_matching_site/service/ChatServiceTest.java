@@ -132,6 +132,24 @@ class ChatServiceTest {
         assertEquals(ErrorCode.PARTICIPATED_NOT_FOUND, ex.getErrorCode());
     }
 
+    @Test
+    void 참여중인_방이_null이면_채팅_실패() {
+        // given
+        Member member = createMember();
+        Participation participation = mock(Participation.class);
+        when(participation.getRoom()).thenReturn(null);
+
+        when(securityUtil.getMemberByUserDetails()).thenReturn(member);
+        when(participationRepository.findActiveParticipation(member.getId())).thenReturn(Optional.of(participation));
+
+        ChatCreateDto chatCreateDto = new ChatCreateDto("안녕하세요");
+
+        // when & then
+        EntityNotFoundException ex = assertThrows(EntityNotFoundException.class,
+                () -> chatService.createChat(chatCreateDto));
+        assertEquals(ErrorCode.ROOM_NOT_FOUND, ex.getErrorCode());
+    }
+
 
 
     @Test
@@ -161,6 +179,12 @@ class ChatServiceTest {
         assertEquals(2, chatHistory.size());
         assertEquals(chat1.getWriter(), member1.getUsername());
         assertEquals(chat2.getWriter(), member2.getUsername());
+
+        ChatReadDto dto1 = chatHistory.get(0);
+        ChatReadDto dto2 = chatHistory.get(1);
+
+        System.out.println("dto1 = " + dto1);
+        System.out.println("dto2 = " + dto2);
     }
 
     @Test
@@ -184,9 +208,25 @@ class ChatServiceTest {
 
     }
 
+    @Test
+    void 참여중인_방이_null이면_채팅_조회_실패() {
+        // given
+        Member member = createMember();
+        Participation participation = mock(Participation.class);
+        when(participation.getRoom()).thenReturn(null);
+
+        when(securityUtil.getMemberByUserDetails()).thenReturn(member);
+        when(participationRepository.findActiveParticipation(member.getId())).thenReturn(Optional.of(participation));
+
+        // when & then
+        EntityNotFoundException ex = assertThrows(EntityNotFoundException.class,
+                () -> chatService.readChat());
+        assertEquals(ErrorCode.ROOM_NOT_FOUND, ex.getErrorCode());
+    }
+
+
     private static Chat createChat1() {
         Chat chat = new Chat();
-        chat.setWriter("코딩초보");
         chat.setChatDateTime(LocalDateTime.now());
         chat.setChatContent("안녕하세요");
         return chat;
@@ -194,7 +234,6 @@ class ChatServiceTest {
 
     private static Chat createChat2() {
         Chat chat = new Chat();
-        chat.setWriter("코딩은둔고수");
         chat.setChatDateTime(LocalDateTime.now());
         chat.setChatContent("반갑습니다.");
         return chat;

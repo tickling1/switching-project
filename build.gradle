@@ -36,6 +36,19 @@ jacocoTestReport {
 		xml.required = true    // XML 리포트 생성 (CI 도구 연동용)
 		csv.required = false   // CSV는 보통 필요 없음
 	}
+
+	classDirectories.setFrom files(classDirectories.files.collect {
+		fileTree(dir: it, includes: [
+				'com/switching/study_matching_site/service/FriendRequestService*.class',
+				'com/switching/study_matching_site/service/ProfileService*.class',
+				'com/switching/study_matching_site/service/NoticeService*.class',
+				'com/switching/study_matching_site/service/RoomService*.class',
+				'com/switching/study_matching_site/service/ChatService*.class',
+				'com/switching/study_matching_site/service/MemberService*.class',
+				'com/switching/study_matching_site/service/RoomSearchService*.class',
+				'com/switching/study_matching_site/service/MatchingService*.class'
+		])
+	})
 }
 
 dependencies {

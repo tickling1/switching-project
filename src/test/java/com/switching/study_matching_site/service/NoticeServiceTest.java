@@ -128,6 +128,25 @@ class NoticeServiceTest {
     }
 
     @Test
+    void 공지사항_생성_실패_참여하지만_방없음() {
+        // given
+        Member member = createMember();
+        Participation participation = mock(Participation.class);
+        when(participation.getRoom()).thenReturn(null);
+
+        when(securityUtil.getMemberIdByUserDetails()).thenReturn(member.getId());
+        when(participationRepository.findActiveParticipation(member.getId()))
+                .thenReturn(Optional.of(participation));
+
+        NoticeCreateDto dto = new NoticeCreateDto("제목", "내용");
+
+        // when & then
+        EntityNotFoundException ex = assertThrows(EntityNotFoundException.class,
+                () -> noticeService.addNotice(dto));
+        assertEquals(ErrorCode.ROOM_NOT_FOUND, ex.getErrorCode());
+    }
+
+    @Test
     void 참여하고_있지_않은_회원_작성_실패() {
         // given
         Member member = createMember();
@@ -243,6 +262,23 @@ class NoticeServiceTest {
     }
 
     @Test
+    void 공지사항_읽기_실패_참여했지만_방이_null() {
+        // given
+        Member member = createMember();
+        Participation participation = mock(Participation.class);
+        when(participation.getRoom()).thenReturn(null);
+
+        when(securityUtil.getMemberIdByUserDetails()).thenReturn(member.getId());
+        when(participationRepository.findActiveParticipation(member.getId()))
+                .thenReturn(Optional.of(participation));
+
+        // when & then
+        EntityNotFoundException ex = assertThrows(EntityNotFoundException.class,
+                () -> noticeService.readNotice(1L));
+        assertEquals(ErrorCode.ROOM_NOT_FOUND, ex.getErrorCode());
+    }
+
+    @Test
     void 방에_없는_읽기_실패() {
         // given
         Member member = createMember();
@@ -265,5 +301,31 @@ class NoticeServiceTest {
         EntityNotFoundException ex = assertThrows(EntityNotFoundException.class, () -> noticeService.readNotice(1L));
         assertEquals(ErrorCode.NOTICE_NOT_FOUND, ex.getErrorCode());
         verify(noticeRepository, times(1)).findById(any());
+    }
+
+    @Test
+    void 공지사항_다른방_공지_읽기_실패() {
+        // given
+        Member member = createMember();
+        Room room1 = createRoomWithJava();
+        Room room2 = createRoomWithPython(); // 실제 공지의 방
+
+        Participation participation = new Participation(room1, RoleType.USER, member);
+
+        Notice notice = new Notice();
+        notice.setId(1L);
+        notice.setNoticeTitle("제목");
+        notice.setNoticeContent("내용");
+        room2.addNotice(notice); // 다른 방에 등록된 공지
+
+        when(securityUtil.getMemberIdByUserDetails()).thenReturn(member.getId());
+        when(participationRepository.findActiveParticipation(member.getId()))
+                .thenReturn(Optional.of(participation));
+        when(noticeRepository.findById(notice.getId())).thenReturn(Optional.of(notice));
+
+        // when & then
+        InvalidValueException ex = assertThrows(InvalidValueException.class,
+                () -> noticeService.readNotice(notice.getId()));
+        assertEquals(ErrorCode.NOTICE_FORBIDDEN, ex.getErrorCode());
     }
 }
