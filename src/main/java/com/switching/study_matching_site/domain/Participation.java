@@ -45,11 +45,9 @@ public class Participation {
         this.leaveDate = null;
         this.member = member;
         this.room = room;
-        System.out.println("Participation constructor started: " + Thread.currentThread().getName());
         member.getParticipation_history().add(this);
         room.getParticipation_history().add(this);
         member.setEnterStatus(EnterStatus.ENTER);
         room.setCurrentCount(room.getCurrentCount() + 1);
-        System.out.println("Participation constructor end"+ Thread.currentThread().getName());
     }
 }

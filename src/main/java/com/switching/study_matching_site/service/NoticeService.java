@@ -65,6 +65,11 @@ public class NoticeService {
         }
 
         Notice findNotice = noticeRepository.findById(noticeId).orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOTICE_NOT_FOUND));
+
+        if (!findNotice.getRoom().equals(room)) {
+            throw new InvalidValueException(ErrorCode.NOTICE_FORBIDDEN);
+        }
+
         NoticeReadDto noticeReadDtoResponse = NoticeReadDto.fromEntity(findNotice);
         return noticeReadDtoResponse;
     }

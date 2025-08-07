@@ -113,7 +113,7 @@ public class RoomService {
      * 방을 참여한 후에는 멤버의 EnterStatus 가 Enter(참여) 으로 되어있어야 함.
      * (Participation을 생성하면 Enter 상태로 변환)
      */
-    @Transactional
+    /*@Transactional
     public synchronized void participateRoomWithSynchronized(Long roomId) {
         Member findMember = securityUtil.getMemberByUserDetails();
         // 회원이 다른 방에 이미 참여 중인지 확인
@@ -133,7 +133,7 @@ public class RoomService {
         // 모든 로직이 정상적으로 종료되면 영속화
         participationRepository.save(participation);
         em.flush();
-    }
+    }*/
 
     /**
      * JPA 비관적 락으로 동시성 문제 해결

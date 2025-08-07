@@ -1,3 +1,4 @@
+/*
 package com.switching.study_matching_site.jwt;
 
 import com.switching.study_matching_site.repository.RefreshRepository;
@@ -95,3 +96,4 @@ public class CustomLogoutFilter extends GenericFilter {
         response.setStatus(HttpServletResponse.SC_OK);
     }
 }
+*/

@@ -1,6 +1,5 @@
 package com.switching.study_matching_site.config;
 
-import com.switching.study_matching_site.jwt.CustomLogoutFilter;
 import com.switching.study_matching_site.jwt.JWTFilter;
 import com.switching.study_matching_site.jwt.JWTUtil;
 import com.switching.study_matching_site.repository.RefreshRepository;
@@ -88,8 +87,8 @@ public class SecurityConfig {
         // 필터 추가 LoginFilter()는 인자를 받음
         // (AuthenticationManager() 메소드에 authenticationConfiguration 객체를 넣어야 함) 따라서 등록 필요
         http
-                .addFilterBefore(new JWTFilter(jwtUtil, customerUserDetailsService), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshRepository), LogoutFilter.class);
+                .addFilterBefore(new JWTFilter(jwtUtil, customerUserDetailsService), UsernamePasswordAuthenticationFilter.class);
+                //.addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshRepository), LogoutFilter.class);
 
         
         //세션을 STATELESS 상태로 설정

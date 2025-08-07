@@ -192,6 +192,37 @@ class RoomServiceTest {
         assertEquals(room.getProjectRegion(), roomUpdateDto.getProjectRegion());
     }
 
+
+    @Test
+    void 방_수정_일부_필드만_업데이트() {
+        Room room = createRoomWithJava();
+        room.setId(1L);
+        Member member = createMember();
+        Participation participation = new Participation(room, RoleType.ADMIN, member);
+
+        RoomUpdateDto partialDto = new RoomUpdateDto(
+                null, // 제목 없음
+                null, // 인원 없음
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                OfflineStatus.ONLINE // 이 필드만 있음
+        );
+
+        when(securityUtil.getMemberIdByUserDetails()).thenReturn(member.getId());
+        when(roomRepository.findById(any())).thenReturn(Optional.of(room));
+        when(participationRepository.findByRoomAndMember(any(), any())).thenReturn(Optional.of(participation));
+
+        roomService.updateRoom(room.getId(), partialDto);
+
+        assertEquals(OfflineStatus.ONLINE, room.getOfflineStatus());
+    }
+
+
+
     @Test
     void 방장이_아닌_회원_방_수정() {
         // given
@@ -558,6 +589,24 @@ class RoomServiceTest {
         // when & then
         EntityNotFoundException ex = assertThrows(EntityNotFoundException.class, () -> roomService.leaveRoom(room.getId()));
         assertEquals(ErrorCode.ROOM_NOT_FOUND, ex.getErrorCode());
+    }
+
+    @Test
+    void 참여자가_없는_방_삭제() {
+        Room room = createRoomWithJava();
+        room.setId(1L);
+        Member admin = createMember();
+        Participation participation = new Participation(room, RoleType.ADMIN, admin);
+
+        room.getParticipation_history().clear(); // 참여자 없도록 설정
+
+        when(securityUtil.getMemberByUserDetails()).thenReturn(admin);
+        when(roomRepository.findById(any())).thenReturn(Optional.of(room));
+        when(participationRepository.findByRoomAndMember(room.getId(), admin.getId())).thenReturn(Optional.of(participation));
+
+        roomService.removeRoom(room.getId());
+
+        assertEquals(RoomStatus.OFF, room.getRoomStatus());
     }
 
     @Test

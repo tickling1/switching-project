@@ -136,6 +136,25 @@ class FriendRequestServiceTest {
     }
 
     @Test
+    void 친구요청_이미_대기중이라면_동일한_상태_반환() {
+        Member sender = createMember1();
+        Member receiver = createMember2();
+
+        FriendRequest pendingRequest = new FriendRequest(sender, receiver);
+        pendingRequest.setStatus(RequestStatus.PENDING);
+
+        when(securityUtil.getMemberByUserDetails()).thenReturn(sender);
+        when(memberRepository.findById(receiver.getId())).thenReturn(Optional.of(receiver));
+        when(friendRequestRepository.findFriendStatusBetween(sender.getId(), receiver.getId()))
+                .thenReturn(Optional.of(pendingRequest));
+
+        FriendRequestResponse response = friendRequestService.requestFriend(receiver.getId());
+
+        assertEquals(RequestStatus.PENDING, response.getStatus());
+    }
+
+
+    @Test
     void 친구_상태_친구_수락_실패() {
         Member sender = createMember1();
         Member receiver = createMember2();

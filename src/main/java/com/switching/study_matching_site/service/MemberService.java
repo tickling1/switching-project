@@ -43,7 +43,6 @@ public class MemberService {
 
     /**
      * 비밀번호 찾기 - 로그인 ID로 조회 후 결과 반환
-     */
     public String forgetPassword(LoginRequestDto loginRequestDto) {
         Optional<Member> findMember = memberRepository.findByLoginId(loginRequestDto.getLoginId());
         if (findMember.isPresent()) {
@@ -54,7 +53,7 @@ public class MemberService {
         } else {
             throw new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND);
         }
-    }
+    }*/
 
     /**
      * 회원 정보 수정

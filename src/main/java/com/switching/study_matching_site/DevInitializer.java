@@ -24,8 +24,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Component
-@Profile("test")
-// @Profile("dev")
+// @Profile("test")
+@Profile("dev")
 @RequiredArgsConstructor
 public class DevInitializer implements CommandLineRunner {
 

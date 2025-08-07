@@ -30,11 +30,9 @@ public class RoomSearchService {
      */
     @Transactional(readOnly = true)
     public RoomDetailDto findRoomById(Long roomId) {
-        Optional<Room> findRoom = roomRepository.findById(roomId);
-        if (findRoom.isPresent()) {
-            return RoomDetailDto.fromEntity(findRoom.get());
-        }
-        throw new EntityNotFoundException(ErrorCode.ROOM_NOT_FOUND);
+        Room findRoom = roomRepository.findById(roomId).orElseThrow(() -> new EntityNotFoundException(ErrorCode.ROOM_NOT_FOUND));
+        return RoomDetailDto.fromEntity(findRoom);
+
     }
 
     /**

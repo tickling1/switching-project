@@ -27,27 +27,22 @@ public class MatchingService {
     @Transactional(readOnly = true)
     public Page<RoomInfoResponseDto> matchingRoomsList() {
         Long memberId = securityUtil.getMemberIdByUserDetails();
-        Optional<Profile> findProfile = profileRepository.findProfileByMemberId(memberId);
+        Profile profile = profileRepository.findProfileByMemberId(memberId).orElseThrow(
+                () -> new EntityNotFoundException(ErrorCode.PROFILE_NOT_FOUND)
+        );
 
-        if (findProfile.isPresent()) {
-            Profile profile = findProfile.get();
-            ProfileCond profileCond = new ProfileCond(
-                    profile.getOfflineStatus(),
-                    profile.getTechSkill(),
-                    profile.getDesiredLevel(),
-                    profile.getStudyGoal(),
-                    profile.getStartTime(),
-                    profile.getEndTime(),
-                    profile.getRegion()
-            );
 
-            PageRequest pageRequest = PageRequest.of(0, 10);
-            return roomRepository.matchingRoom(profileCond, pageRequest);
+        ProfileCond profileCond = new ProfileCond(
+                profile.getOfflineStatus(),
+                profile.getTechSkill(),
+                profile.getDesiredLevel(),
+                profile.getStudyGoal(),
+                profile.getStartTime(),
+                profile.getEndTime(),
+                profile.getRegion()
+        );
 
-        } else {
-            throw new EntityNotFoundException(ErrorCode.PROFILE_NOT_FOUND);
-        }
+        PageRequest pageRequest = PageRequest.of(0, 10);
+        return roomRepository.matchingRoom(profileCond, pageRequest);
     }
-
-
 }

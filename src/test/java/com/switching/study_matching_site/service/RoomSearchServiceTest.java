@@ -3,6 +3,7 @@ package com.switching.study_matching_site.service;
 import com.switching.study_matching_site.domain.Room;
 import com.switching.study_matching_site.domain.type.*;
 import com.switching.study_matching_site.dto.condition.RoomSearchCond;
+import com.switching.study_matching_site.dto.room.PageResponseDto;
 import com.switching.study_matching_site.dto.room.RoomDetailDto;
 import com.switching.study_matching_site.dto.room.RoomInfoResponseDto;
 import com.switching.study_matching_site.exception.EntityNotFoundException;
@@ -17,11 +18,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -157,5 +160,35 @@ class RoomSearchServiceTest {
 
         // then
         assertTrue(result.isEmpty());  // 결과가 비어 있는지 검증
+    }
+
+    @Test
+    void 방_전체_조회_성공() {
+        // given
+        Room room1 = createRoomWithJava();
+        Room room2 = createRoomWithPython();
+
+        List<Room> roomList = List.of(room1, room2);
+        PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "startTime"));
+        Page<Room> roomPage = new PageImpl<>(roomList, pageRequest, roomList.size());
+
+        when(roomRepository.findAll(any(PageRequest.class))).thenReturn(roomPage);
+
+        // when
+        PageResponseDto<RoomInfoResponseDto> result = roomSearchService.roomInfoList();
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.getContent()).hasSize(2);
+        assertThat(result.getTotalElements()).isEqualTo(2);
+        assertThat(result.getTotalPages()).isEqualTo(1);
+
+        RoomInfoResponseDto dto1 = result.getContent().get(0);
+        assertThat(dto1.getRoomTitle()).isEqualTo(room1.getRoomTitle());
+        assertThat(dto1.getCurrentCount()).isEqualTo(room1.getCurrentCount());
+
+        RoomInfoResponseDto dto2 = result.getContent().get(1);
+        assertThat(dto2.getRoomTitle()).isEqualTo(room2.getRoomTitle());
+        assertThat(dto2.getCurrentCount()).isEqualTo(room2.getCurrentCount());
     }
 }

@@ -55,7 +55,8 @@ class ProfileServiceTest {
         when(securityUtil.getMemberByUserDetails()).thenReturn(member);
 
         // when
-        ProfileCreateDto dto = new ProfileCreateDto(OfflineStatus.OFFLINE,
+        ProfileCreateDto dto = new ProfileCreateDto(
+                OfflineStatus.OFFLINE,
                 TechSkill.KOTLIN,
                 3,
                 Goal.STUDY,
@@ -249,6 +250,52 @@ class ProfileServiceTest {
         assertEquals(updateProfile.getStudyGoal(), Goal.STUDY);
         assertEquals(updateProfile.getRegion(), Region.SEOUL);
         assertEquals(updateProfile.getDesiredLevel(), 3);
+    }
+
+    @Test
+    void 프로필_없으면_업데이트_실패() {
+        // given
+        Member member = createMember(); // 프로필 없이
+        when(securityUtil.getMemberByUserDetails()).thenReturn(member);
+
+        ProfileUpdateDto dto = new ProfileUpdateDto(null, null, null,
+                null, null, null, null, null);
+
+        // when & then
+        InvalidValueException ex = assertThrows(InvalidValueException.class,
+                () -> profileService.updateProfile(dto));
+
+        assertEquals(ex.getErrorCode(), ErrorCode.PROFILE_NOT_FOUND);
+    }
+
+    @Test
+    void 프로필_일부_필드만_수정_성공() {
+        // given
+        Member member = createMember();
+        Profile profile = new Profile(1L, OfflineStatus.OFFLINE, TechSkill.KOTLIN, 3, Goal.STUDY,
+                LocalTime.now(), LocalTime.now().plusHours(2), Region.SEOUL, false, member);
+        member.addProfile(profile);
+
+        when(securityUtil.getMemberByUserDetails()).thenReturn(member);
+
+        // 일부 필드만 null 아님
+        ProfileUpdateDto dto = new ProfileUpdateDto(
+                null,
+                TechSkill.JAVA,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+
+        // when
+        profileService.updateProfile(dto);
+
+        // then
+        assertEquals(profile.getTechSkill(), TechSkill.JAVA);
+        assertEquals(profile.getDesiredLevel(), 3); // 그대로 유지
     }
 
 }
