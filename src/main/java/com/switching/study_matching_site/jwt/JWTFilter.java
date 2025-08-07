@@ -34,6 +34,8 @@ public class JWTFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         String requestURI = request.getRequestURI();
+        System.out.println("[JWT 필터] URI: " + request.getRequestURI());
+
 
         // 로그인, 회원가입, 토큰 재발급 경로는 JWT 필터를 거치지 않도록 설정
         if (requestURI.startsWith("/members/login") ||
