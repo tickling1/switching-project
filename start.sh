@@ -19,30 +19,38 @@ mkdir -p $LOG_PATH
 # -----------------------
 # 배포 파일 다운로드
 # -----------------------
-echo "⬇️ Downloading new deployment package from S3..."
+echo "⬇️ S3에서 새 배포 패키지 다운로드 중..."
 aws s3 cp s3://$S3_BUCKET/$S3_KEY $DEPLOY_PATH/app.zip
 if [ $? -ne 0 ]; then
-  echo "❗ Failed to download app.zip"
+  echo "❗ app.zip 다운로드 실패"
   exit 1
 fi
-echo "✅ Download successful!"
+echo "✅ 다운로드 성공!"
 
 # -----------------------
 # ZIP 압축 해제
 # -----------------------
-echo "📦 Unzipping app.zip..."
+echo "📦 app.zip 압축 해제 중..."
 unzip -o $DEPLOY_PATH/app.zip -d $DEPLOY_PATH
 if [ $? -ne 0 ]; then
-  echo "❗ Failed to unzip app.zip"
+  echo "❗ 압축 해제 실패"
   exit 1
 fi
 
 # -----------------------
 # 현재 실행 중인 포트 확인
 # -----------------------
-echo "🔍 Checking current running port..."
+echo "🔍 현재 실행 중인 서버 포트 확인..."
 
-CURRENT_PORT=$(pgrep -f $JAR_NAME | xargs -r -I {} sudo lsof -Pan -p {} -i | grep LISTEN | awk '{print $9}' | sed 's/.*://')
+# 실행 중인 JAR 프로세스 PID 추출
+CURRENT_PID=$(pgrep -f $JAR_NAME)
+
+if [ -n "$CURRENT_PID" ]; then
+  # PID로 포트 확인 (LISTEN 중인 포트)
+  CURRENT_PORT=$(sudo lsof -Pan -p $CURRENT_PID -i | grep LISTEN | awk '{print $9}' | sed 's/.*://')
+else
+  CURRENT_PORT=""
+fi
 
 if [ "$CURRENT_PORT" == "$PORT_A" ]; then
   IDLE_PORT=$PORT_B
@@ -52,59 +60,76 @@ else
   IDLE_PORT=$PORT_A
 fi
 
-echo "✅ Current Port: ${CURRENT_PORT:-none}, Next Port: $IDLE_PORT"
+echo "✅ 현재 포트: ${CURRENT_PORT:-없음}, 새 서버 포트: $IDLE_PORT"
+
+# -----------------------
+# 기존 서버 종료
+# -----------------------
+if [ -n "$CURRENT_PORT" ]; then
+  echo "🛑 기존 서버($CURRENT_PORT 포트) 종료 중..."
+  OLD_PIDS=$(sudo lsof -t -i :$CURRENT_PORT)
+  if [ -n "$OLD_PIDS" ]; then
+    kill -15 $OLD_PIDS
+    sleep 5
+    # 종료 안 됐으면 강제 종료
+    OLD_PIDS=$(sudo lsof -t -i :$CURRENT_PORT)
+    if [ -n "$OLD_PIDS" ]; then
+      echo "⚠️ 강제 종료 중..."
+      kill -9 $OLD_PIDS
+    fi
+    echo "✅ 기존 서버 종료 완료"
+  else
+    echo "✅ 종료할 프로세스 없음"
+  fi
+else
+  echo "✅ 실행 중인 서버 없음"
+fi
 
 # -----------------------
 # 새 서버 실행
 # -----------------------
-echo "🚀 Starting new server on port $IDLE_PORT..."
+echo "🚀 새 서버를 포트 $IDLE_PORT 로 시작합니다..."
 nohup java -jar -Dserver.port=$IDLE_PORT $DEPLOY_PATH/$JAR_NAME > $LOG_PATH/nohup_$IDLE_PORT.out 2>&1 &
 
 # -----------------------
 # 헬스체크
 # -----------------------
-echo "⏳ Health check on port $IDLE_PORT (max 10 tries)..."
+echo "⏳ 새 서버 헬스체크 중 (최대 10회 시도)..."
 
 for i in {1..10}
 do
   RESPONSE=$(curl -s http://localhost:$IDLE_PORT$HEALTH_CHECK_PATH | grep '"status":"UP"')
   if [ -n "$RESPONSE" ]; then
-    echo "✅ Health check passed!"
-
-        # -----------------------
-        # Nginx 연결 포트 스위칭
-        # -----------------------
-        echo "🔀 Switching Nginx upstream port..."
-
-        CURRENT_PORT_CHECK=$(sudo lsof -i -P -n | grep LISTEN | grep 9090)
-        if [ -z "$CURRENT_PORT_CHECK" ]; then
-          echo "⚡ 9090 is down. Switching Nginx to 9091."
-          sudo sed -i 's/9090/9091/g' /etc/nginx/sites-available/default
-        else
-          echo "⚡ 9091 is down. Switching Nginx to 9090."
-          sudo sed -i 's/9091/9090/g' /etc/nginx/sites-available/default
-        fi
-        sudo nginx -s reload
-        echo "✅ Nginx reloaded with new port."
+    echo "✅ 헬스체크 통과!"
 
     # -----------------------
-    # 기존 서버 종료
+    # Nginx 업스트림 포트 스위칭
     # -----------------------
-    if [ -n "$CURRENT_PORT" ]; then
-      echo "🛑 Stopping old server on port $CURRENT_PORT..."
-      OLD_PID=$(sudo lsof -t -i :$CURRENT_PORT)
-      if [ -n "$OLD_PID" ]; then
-        kill -15 $OLD_PID
-        echo "✅ Old server stopped."
-      fi
+    echo "🔀 Nginx 업스트림 서버 포트 변경 중..."
+
+    # 기존 포트가 9090이면 9091로, 아니면 9090으로 변경
+    if grep -q "server 127.0.0.1:9090" /etc/nginx/sites-available/default; then
+      # 9090은 주석처리, 9091은 주석 해제
+      sudo sed -i 's/^#server 127.0.0.1:9091/server 127.0.0.1:9091/' /etc/nginx/sites-available/default
+      sudo sed -i 's/^server 127.0.0.1:9090/#server 127.0.0.1:9090/' /etc/nginx/sites-available/default
+      echo "⚡ Nginx 업스트림을 9091로 변경"
+    else
+      # 9091은 주석처리, 9090은 주석 해제
+      sudo sed -i 's/^#server 127.0.0.1:9090/server 127.0.0.1:9090/' /etc/nginx/sites-available/default
+      sudo sed -i 's/^server 127.0.0.1:9091/#server 127.0.0.1:9091/' /etc/nginx/sites-available/default
+      echo "⚡ Nginx 업스트림을 9090으로 변경"
     fi
+
+    # Nginx 재시작
+    sudo nginx -s reload
+    echo "✅ Nginx 재시작 완료"
 
     exit 0
   else
-    echo "❗ Health check failed (attempt $i)..."
+    echo "❗ 헬스체크 실패 ($i 번째 시도)... 5초 후 재시도"
     sleep 5
   fi
 done
 
-echo "❗ Health check failed after 10 tries. Deployment failed."
+echo "❗ 헬스체크 10회 실패, 배포 실패"
 exit 1
