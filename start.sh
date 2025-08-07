@@ -42,11 +42,9 @@ fi
 # -----------------------
 echo "🔍 현재 실행 중인 서버 포트 확인..."
 
-# 실행 중인 JAR 프로세스 PID 추출
 CURRENT_PID=$(pgrep -f $JAR_NAME)
 
 if [ -n "$CURRENT_PID" ]; then
-  # PID로 포트 확인 (LISTEN 중인 포트)
   CURRENT_PORT=$(sudo lsof -Pan -p $CURRENT_PID -i | grep LISTEN | awk '{print $9}' | sed 's/.*://')
 else
   CURRENT_PORT=""
@@ -69,13 +67,12 @@ if [ -n "$CURRENT_PORT" ]; then
   echo "🛑 기존 서버($CURRENT_PORT 포트) 종료 중..."
   OLD_PIDS=$(sudo lsof -t -i :$CURRENT_PORT)
   if [ -n "$OLD_PIDS" ]; then
-    kill -15 $OLD_PIDS
+    sudo kill -15 $OLD_PIDS
     sleep 5
-    # 종료 안 됐으면 강제 종료
     OLD_PIDS=$(sudo lsof -t -i :$CURRENT_PORT)
     if [ -n "$OLD_PIDS" ]; then
       echo "⚠️ 강제 종료 중..."
-      kill -9 $OLD_PIDS
+      sudo kill -9 $OLD_PIDS
     fi
     echo "✅ 기존 서버 종료 완료"
   else
@@ -102,9 +99,6 @@ do
   if [ -n "$RESPONSE" ]; then
     echo "✅ 헬스체크 통과!"
 
-    # -----------------------
-    # Nginx 업스트림 포트 스위칭
-    # -----------------------
     echo "🔀 Nginx 업스트림 서버 포트 변경 중..."
 
     if grep -q "server 127.0.0.1:9090" /etc/nginx/sites-available/default; then
