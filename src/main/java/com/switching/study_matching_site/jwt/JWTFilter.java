@@ -12,6 +12,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,7 +21,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.logging.Logger;
 
+@Slf4j
 public class JWTFilter extends OncePerRequestFilter {
 
     private final JWTUtil jwtUtil;
@@ -35,6 +39,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
         String requestURI = request.getRequestURI();
         System.out.println("[JWT 필터] URI: " + request.getRequestURI());
+        log.info("[JWT 필터] URI: " + request.getRequestURI());
 
 
         // 로그인, 회원가입, 토큰 재발급 경로는 JWT 필터를 거치지 않도록 설정
