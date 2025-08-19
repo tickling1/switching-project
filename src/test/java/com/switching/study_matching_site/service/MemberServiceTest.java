@@ -46,8 +46,7 @@ class MemberServiceTest {
                 "testMember",
                 LocalDate.now(),
                 "xuni1234@gmail.com",
-                "010-1111-1111",
-                EnterStatus.ENTER
+                "010-1111-1111"
         );
         return dto;
     }
