@@ -52,13 +52,12 @@ public class DevInitializer implements CommandLineRunner {
         for (int i = 1; i <= 25; i++) {
 
             MemberCreateDto memberDto = new MemberCreateDto(
+                    "testMember" + i,
                     "loginId" + i,
                     "wwwww",
-                    "testMember" + i,
                     LocalDate.now(),
                     "test" + i + "@gmail.com",
-                    "010-0000-000" + i,
-                    EnterStatus.OUT
+                    "010-0000-000" + i
             );
 
             Long memberId = memberService.joinMember(memberDto);
