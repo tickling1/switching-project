@@ -1,6 +1,7 @@
 package com.switching.study_matching_site.dto.notice;
 
 import com.switching.study_matching_site.domain.Notice;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,7 +15,10 @@ import java.time.LocalDateTime;
 @Setter
 public class NoticeCreateDto {
 
+    @NotNull
     private String title;
+
+    @NotNull
     private String content;
 
     /**

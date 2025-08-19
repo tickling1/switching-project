@@ -3,6 +3,7 @@ package com.switching.study_matching_site.dto.room;
 import com.switching.study_matching_site.domain.*;
 import com.switching.study_matching_site.domain.type.*;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,30 +17,39 @@ import java.util.UUID;
 @Getter
 public class RoomCreateDto {
 
+    @NotNull
     @Schema(description = "방 제목")
     private String roomTitle;
-    
+
+    @NotNull
     @Schema(description = "최대 인원 수")
     private Integer maxCount;
 
+    @NotNull
     @Schema(description = "스터디 시작 시간")
     private LocalTime startTime;
 
+    @NotNull
     @Schema(description = "스터디 종료 시간")
     private LocalTime endTime;
 
+    @NotNull
     @Schema(description = "스터디 목적", example = "STUDY, PORTFOLIO, IMPROVE, STARTUP")
     private Goal projectGoal;
 
+    @NotNull
     @Schema(description = "스터디 사용 기술", example = "JAVA, PYTHON, KOTLIN, C, JAVASCRIPT")
     private TechSkill techSkill;
 
+    @NotNull
     @Schema(description = "프로젝트 수준")
     private Integer projectLevel;
 
+    @NotNull
     @Schema(description = "스터디 가능 지역", example = "SEOUL")
     private Region projectRegion;
 
+    @NotNull
     @Schema(description = "오프라인 여부", example = "OFFLINE, ONLINE")
     private OfflineStatus offlineStatus;
 
