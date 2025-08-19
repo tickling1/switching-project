@@ -3,6 +3,7 @@ package com.switching.study_matching_site.dto.member;
 import com.switching.study_matching_site.domain.type.EnterStatus;
 import com.switching.study_matching_site.domain.Member;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import org.hibernate.validator.constraints.Length;
@@ -39,7 +40,7 @@ public class MemberCreateDto {
      * 특수문자나 공백은 포함되지 않음
      * 숫자는 필수가 아님
      */
-    //@NotNull
+    @NotNull
     @Schema(description = "회원 로그인 아이디", example = "example")
     @Pattern(regexp = "^(?=.*[a-zA-Z])(?!.*[^a-zA-Z0-9]).{5,10}",
         message = "아이디는 5글자 이상 10글자 이하여야 합니다.")
@@ -51,7 +52,7 @@ public class MemberCreateDto {
      * 영문자, 숫자, 특수문자 각각 최소 1개 이상 포함.
      * 허용된 특수문자는 @$!%*#?&로 제한됩니다
      */
-    //@NotNull
+    @NotNull
     @Schema(description = "회원 비밀번호", example = "lucky123!")
     @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,30}$",
             message = "* 비밀번호 길이는 8자 이상 30자 이하.\n" +
@@ -59,13 +60,13 @@ public class MemberCreateDto {
                 "     * (허용된 특수문자: @$!%*#?&)")
     private String password;
 
-    //@NotNull
+    @NotNull
     @Schema(description = "회원 이름")
     @Length(min = 3, max = 7,
     message = "3글자 이상 7글자 미만이여야 합니다.")
     private String username;
 
-    //@NotNull
+    @NotNull
     @Schema(description = "회원 생년월일", defaultValue = "2000-01-30")
     @DateTimeFormat(pattern = "yyyy-mm-dd")
     private LocalDate birthDate;
@@ -74,25 +75,18 @@ public class MemberCreateDto {
      * @Pattern
      * 5자에서 20자 사이의 문자+특수문자 형식의 사용자명, 뒤에 도메인 형식
      */
-    //@NotNull
+    @NotNull
     @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{5,20}@[A-Za-z]{2,}\\.[A-Za-z]{2,}$",
             message = "올바른 이메일 형식이 아닙니다.")
     @Schema(description = "회원 이메일", example = "example@gmail.com")
     private String email;
 
-    //@NotNull
+    @NotNull
     @Schema(description = "회원 핸드폰 번호", example = "010-1111-2222")
     @Length(max = 13)
     @Pattern(regexp = "^01([0|1|6|7|8|9])-?([0-9]{3,4})-?([0-9]{4})$",
             message = "올바른 휴대폰 번호 형식이 아닙니다. ex) 010-1111-2222")
     private String phoneNumber;
-
-    // @NotNull
-    @Builder.Default
-    @Schema(description = "방 입장 여부", defaultValue = "OUT")
-    private EnterStatus enterStatus = EnterStatus.OUT;
-
-
 
     /**
      * DTO -> ENTITY 변환 메소드
@@ -105,7 +99,7 @@ public class MemberCreateDto {
         entity.setBirthDate(this.birthDate);
         entity.setEmail(this.email);
         entity.setPhoneNumber(this.phoneNumber);
-        entity.setEnterStatus(this.enterStatus);
+        entity.setEnterStatus(EnterStatus.OUT);
         return entity;
     }
 
@@ -120,7 +114,6 @@ public class MemberCreateDto {
                 .birthDate(entity.getBirthDate())
                 .loginId(entity.getLoginId())
                 .password(entity.getPassword())
-                .enterStatus(entity.getEnterStatus())
                 .username(entity.getUsername())
                 .build();
 
@@ -135,7 +128,6 @@ public class MemberCreateDto {
                 ", birthDate=" + birthDate +
                 ", email='" + email + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +
-                ", enterStatus=" + enterStatus +
                 '}';
     }
 }

@@ -2,6 +2,7 @@ package com.switching.study_matching_site.dto.chat;
 
 import com.switching.study_matching_site.domain.Chat;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
