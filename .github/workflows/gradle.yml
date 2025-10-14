@@ -23,6 +23,8 @@ jobs:
 
       - name: Build with Gradle (prod profile)
         run: ./gradlew clean build -Dspring.profiles.active=prod
+        env:
+          KAKAO_API_KEY: ${{ secrets.KAKAO_API_KEY }}
 
       - name: Generate JaCoCo Test Coverage Report
         run: ./gradlew jacocoTestReport
