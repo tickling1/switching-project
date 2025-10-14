@@ -24,8 +24,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Component
-// @Profile("test")
-@Profile("dev")
+@Profile("test")
+// @Profile("dev")
 @RequiredArgsConstructor
 public class DevInitializer implements CommandLineRunner {
 
@@ -52,9 +52,9 @@ public class DevInitializer implements CommandLineRunner {
         for (int i = 1; i <= 25; i++) {
 
             MemberCreateDto memberDto = new MemberCreateDto(
-                    "testMember" + i,
                     "loginId" + i,
                     "wwwww",
+                    "testMember" + i,
                     LocalDate.now(),
                     "test" + i + "@gmail.com",
                     "010-0000-000" + i
@@ -104,8 +104,8 @@ public class DevInitializer implements CommandLineRunner {
                 RoomStatus.ON,
                 0,
                 6,
-                LocalTime.now(),
-                LocalTime.now().plusHours(3),
+                LocalTime.now().withNano(0),
+                LocalTime.now().plusHours(3).withNano(0),
                 Goal.STUDY,
                 TechSkill.JAVA,
                 3,

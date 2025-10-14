@@ -45,6 +45,11 @@ public class JWTFilter extends OncePerRequestFilter {
         // 로그인, 회원가입, 토큰 재발급 경로는 JWT 필터를 거치지 않도록 설정
         if (requestURI.startsWith("/members/login") ||
                 requestURI.startsWith("/members/signup") ||
+                requestURI.startsWith("/geohash") ||
+                requestURI.startsWith("/study-places-example1") ||
+                requestURI.startsWith("/study-places-example2") ||
+                requestURI.startsWith("/study-places-fetch") ||
+                requestURI.startsWith("/dummy") ||
                 requestURI.startsWith("/members/reissue") ||
                 requestURI.startsWith("/members/logout") ||
                 requestURI.startsWith("/reissue") ||
@@ -53,6 +58,7 @@ public class JWTFilter extends OncePerRequestFilter {
                 requestURI.startsWith("/v3/api-docs") ||
                 requestURI.startsWith("/swagger-resources") ||
                 requestURI.startsWith("/rooms/list") ||
+                requestURI.startsWith("/study-places") ||
                 requestURI.startsWith("/actuator/health")){
             filterChain.doFilter(request, response);
             return;

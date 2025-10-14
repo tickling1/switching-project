@@ -57,7 +57,13 @@ public enum ErrorCode {
     JWT_TOKEN_TAMPERED(403, "J005","JWT 토큰이 변조되었습니다."),
 
     // DB LOCK
-    PESSIMISTIC_LOCK_FAILED(409, "L001", "현재 방에 참여 요청이 많습니다. 잠시 후 다시 시도해주세요.");
+    PESSIMISTIC_LOCK_FAILED(409, "L001", "현재 방에 참여 요청이 많습니다. 잠시 후 다시 시도해주세요."),
+
+    // 스케줄러 오류
+    SCHEDULER_FAILED(400, "S001", "스터디룸 현행화가 실패했습니다"),
+
+    // API 오류
+    NOT_ENOUGH_DATA(400, "A001", "근거리 스터디룸 데이터를 확보할 수 없습니다.");
 
     private final String code;
     private final String message;

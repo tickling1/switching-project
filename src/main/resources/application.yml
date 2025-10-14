@@ -11,12 +11,6 @@ spring:
   jwt:
     secret: ${spring.jwt.secret}
 
-springdoc:
-  swagger-ui:
-    path: /
-  api-docs:
-    path: /v3/api-docs
-
 server:
   port: 8080  # 기본 포트 (환경별로 덮어쓰기 가능)
 
