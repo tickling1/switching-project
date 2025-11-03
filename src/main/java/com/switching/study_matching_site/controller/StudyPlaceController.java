@@ -6,7 +6,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.util.concurrent.RateLimiter;
 import com.switching.study_matching_site.domain.StudyPlace;
-import com.switching.study_matching_site.dto.studyplace.LocationDto;
+import com.switching.study_matching_site.dto.studyplace.LocationRequestDto;
+import com.switching.study_matching_site.dto.studyplace.LocationResponseDto;
 import com.switching.study_matching_site.repository.StudyPlaceRepository;
 import com.switching.study_matching_site.service.KakaoLocalService;
 import com.switching.study_matching_site.service.StudyPlaceService;
@@ -17,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
@@ -40,7 +40,7 @@ public class StudyPlaceController {
     private static final int SLEEP_MS = 300; // QPS 제한
 
     @PostMapping("/study-places")
-    public List<StudyPlace> getNearbyStudyPlaces(@RequestBody LocationDto location) throws JsonProcessingException {
+    public List<LocationResponseDto> getNearbyStudyPlaces(@RequestBody LocationRequestDto location) throws JsonProcessingException {
         return studyPlaceService.getNearbyOrFetch(location.getLng(), location.getLat());
     }
 
@@ -199,13 +199,13 @@ public class StudyPlaceController {
 
     // 테이블 풀 스캔
     @PostMapping("/study-places-example1")
-    public List<StudyPlace> getNearbyStudyPlaces1(@RequestBody LocationDto location) throws JsonProcessingException {
+    public List<LocationResponseDto> getNearbyStudyPlaces1(@RequestBody LocationRequestDto location) throws JsonProcessingException {
         return studyPlaceService.searchNearbyRooms(location.getLat(), location.getLng());
     }
 
     // 위 경도
     @PostMapping("/study-places-example2")
-    public List<StudyPlace> getNearbyStudyPlaces2(@RequestBody LocationDto location) throws JsonProcessingException {
+    public List<LocationResponseDto> getNearbyStudyPlaces2(@RequestBody LocationRequestDto location) throws JsonProcessingException {
         return studyPlaceService.getNearbyWithRounding(location.getLat(), location.getLng());
     }
 
@@ -248,9 +248,7 @@ public class StudyPlaceController {
     @PostMapping("/dummy")
     @Transactional
     public String generateDummyData() {
-        int totalCount = 57000;
-        int seoulCount = 12000; // 서울 데이터 수
-        int nationwideCount = totalCount - seoulCount; // 전국 데이터 수
+        int nationwideCount = 1000000; // 전국 데이터 수
 
         Faker faker = new Faker(new Locale("ko")); // 한국어 Faker
         Random random = new Random();
@@ -259,11 +257,6 @@ public class StudyPlaceController {
         List<StudyPlace> batch = new ArrayList<>(batchSize);
         LocalDateTime now = LocalDateTime.now();
 
-        // 서울 위도·경도 범위 (대략)
-        double seoulLatStart = 37.413;
-        double seoulLatEnd = 37.713;
-        double seoulLngStart = 126.734;
-        double seoulLngEnd = 127.034;
 
         // 전국 위도·경도 범위 (대한민국 전체)
         double nationwideLatStart = 33.0;
@@ -271,19 +264,6 @@ public class StudyPlaceController {
         double nationwideLngStart = 124.0;
         double nationwideLngEnd = 132.0;
 
-        // 1) 서울 데이터 생성
-        for (int i = 0; i < seoulCount; i++) {
-            double lat = seoulLatStart + random.nextDouble() * (seoulLatEnd - seoulLatStart);
-            double lng = seoulLngStart + random.nextDouble() * (seoulLngEnd - seoulLngStart);
-
-            StudyPlace place = createStudyPlace(faker, lat, lng, now);
-            batch.add(place);
-
-            if (batch.size() >= batchSize) {
-                studyPlaceRepository.saveAll(batch);
-                batch.clear();
-            }
-        }
 
         // 2) 전국 데이터 생성
         for (int i = 0; i < nationwideCount; i++) {
@@ -303,7 +283,7 @@ public class StudyPlaceController {
             studyPlaceRepository.saveAll(batch);
         }
 
-        return totalCount + "개의 대한민국 전체 더미 데이터를 생성했습니다. (서울 " + seoulCount + "개 포함)";
+        return nationwideCount + "개의 대한민국 전체 더미 데이터를 생성했습니다.";
     }
 
     private StudyPlace createStudyPlace(Faker faker, double lat, double lng, LocalDateTime now) {

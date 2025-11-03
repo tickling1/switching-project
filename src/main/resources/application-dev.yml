@@ -5,9 +5,10 @@ spring:
       on-profile: dev
 
   datasource:
-    url: "jdbc:h2:tcp://localhost/~/dev/switching-project;MODE=MySQL"
-    username: "sa"
-    driver-class-name: org.h2.Driver
+    url: "jdbc:mysql://127.0.0.1:3306/switching"
+    username: "root"
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    password: "rltmddn7!"
 
   jwt:
     secret: "my-very-strong-secret-key-that-is-long-enough-1234567890"
@@ -18,7 +19,7 @@ spring:
     properties:
       javax.persistence.lock.timeout: 3000 # 밀리초 단위, 3초
       hibernate:
-        dialect: org.hibernate.dialect.H2Dialect
+        dialect: org.hibernate.dialect.MySQLDialect
         show_sql: false
         format_sql: false
 
@@ -26,28 +27,6 @@ spring:
 logging.level:
   org.hibernate.SQL: OFF
   org.hibernate.type.descriptor.sql.BasicBinder: OFF
-
-resilience4j:
-  ratelimiter:
-    instances:
-      kakaoApiUser:        # 사용자 요청용
-        limit-for-period: 50        # 1초 동안 최대 50회 호출 허용
-        limit-refresh-period: 500ms # 제한 카운트 갱신 주기: 0.5초
-        timeout-duration: 200ms     # 초과 시 최대 0.2초 대기 후 실패
-      kakaoApiBatch:       # 배치 갱신용
-        limit-for-period: 30        # 1초 동안 최대 30회 호출 허용
-        limit-refresh-period: 1s    # 제한 카운트 갱신 주기: 1초
-        timeout-duration: 500ms     # 초과 시 최대 0.5초 대기 후 실패
-
-  retry:
-    instances:
-      kakaoApiBatchRetry:
-        max-attempts: 3            # 최대 3번 시도
-        wait-duration: 2s          # 각 시도 간 대기 시간
-        retry-exceptions:
-          - org.springframework.web.client.HttpServerErrorException
-          - org.springframework.web.client.ResourceAccessException
-          - java.net.SocketTimeoutException
 
 custom:
   secret:

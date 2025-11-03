@@ -63,7 +63,9 @@ public enum ErrorCode {
     SCHEDULER_FAILED(400, "S001", "스터디룸 현행화가 실패했습니다"),
 
     // API 오류
-    NOT_ENOUGH_DATA(400, "A001", "근거리 스터디룸 데이터를 확보할 수 없습니다.");
+    NOT_ENOUGH_DATA(400, "A001", "근거리 스터디룸 데이터를 확보할 수 없습니다."),
+    // 토큰 부족
+    TOO_MANY_REQUESTS(429, "R120", "요청 횟수가 제한을 초과했습니다.");
 
     private final String code;
     private final String message;

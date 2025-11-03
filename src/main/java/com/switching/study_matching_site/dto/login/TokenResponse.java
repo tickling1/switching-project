@@ -6,7 +6,7 @@ public class TokenResponse {
     private String refreshToken;
 
     public TokenResponse(String accessToken, String refreshToken) {
-        this.accessToken = accessToken;
+        this.accessToken = "Bearer ".concat(accessToken);
         this.refreshToken = refreshToken;
     }
 

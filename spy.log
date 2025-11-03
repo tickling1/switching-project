@@ -1,0 +1,2 @@
+select sp1_0.id,sp1_0.address,sp1_0.created_at,sp1_0.geohash,sp1_0.is_active,sp1_0.last_checked_at,sp1_0.lat,sp1_0.lng,sp1_0.phone,sp1_0.place_name,sp1_0.place_url,sp1_0.road_address,sp1_0.source from study_place sp1_0 where sp1_0.place_name='온랩스터디카페 행신본점' and sp1_0.address='경기 고양시 덕양구 행신동 1083';
+

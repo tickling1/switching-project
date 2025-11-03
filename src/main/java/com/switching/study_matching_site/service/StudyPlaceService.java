@@ -4,9 +4,12 @@ import ch.hsr.geohash.GeoHash;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.switching.study_matching_site.SecurityUtil;
 import com.switching.study_matching_site.domain.EmptyRegion;
 import com.switching.study_matching_site.domain.StudyPlace;
 
+import com.switching.study_matching_site.dto.studyplace.CellCountDto;
+import com.switching.study_matching_site.dto.studyplace.LocationResponseDto;
 import com.switching.study_matching_site.repository.EmptyRegionRepository;
 import com.switching.study_matching_site.repository.StudyPlaceRepository;
 
@@ -26,53 +29,56 @@ public class StudyPlaceService {
 
     private final StudyPlaceRepository studyPlaceRepository;
     private final KakaoLocalService kakaoLocalService;
-    private final EmptyRegionRepository emptyRegionRepository;
     private static final int GEOHASH_PRECISION = 6;
 
-    // 테이블 풀스캔
     @Transactional
-    public List<StudyPlace> searchNearbyRooms(double lat, double lng) throws JsonProcessingException {
-        final int maxCandidates = 20;
-        final int minCandidates = 5;
-        LocalDateTime threshold = LocalDateTime.now().minusWeeks(1);
+    public List<LocationResponseDto> searchNearbyRooms(double lat, double lng) throws JsonProcessingException {
+        final int maxCandidates = 15; // 최대 15개
+        final double radiusKm = 1.0;   // 하버사인 필터링 반경
 
-        // 1) DB에서 최근 1주일 내 데이터만 가져오기 (위치 필터링은 제외)
-        List<StudyPlace> candidates = studyPlaceRepository.findRecentPlaces(threshold);
-        System.out.println("candidates = " + candidates);
+        // 1) API 호출 (DB 저장 없이 바로 가져오기)
+        List<JsonNode> apiResults = kakaoLocalService.searchStudyRooms("스터디룸", lng, lat);
 
-        // 2) 자바에서 하버사인 계산
-        List<StudyPlace> nearbyPlaces = filterWithinRadius(candidates, lat, lng, 1.0);
+        // 2) JsonNode → StudyPlace DTO 변환
+        List<StudyPlace> candidates = apiResults.stream()
+                .map(node -> {
+                    StudyPlace sp = new StudyPlace();
+                    sp.setPlaceName(node.get("place_name").asText());
+                    sp.setLat(node.get("y").asDouble());
+                    sp.setLng(node.get("x").asDouble());
+                    sp.setAddress(node.get("address_name").asText());
+                    sp.setRoadAddress(node.get("road_address_name").asText());
+                    sp.setPhone(node.get("phone").asText());
+                    return sp;
+                })
+                .collect(Collectors.toList());
 
-        // 3) 후보 부족 시 API 호출
-        if (nearbyPlaces.size() < minCandidates) {
-            System.out.println("nearbyPlaces = " + nearbyPlaces);
-            // API 호출
-            fetchAndUpdatePlaces(lat, lng);
-            List<StudyPlace> recentPlaces = studyPlaceRepository.findRecentPlaces(threshold);
-            List<StudyPlace> studyPlaces = filterWithinRadius(recentPlaces, lat, lng, 1.0);
-            nearbyPlaces.addAll(studyPlaces);
+        // 3) 하버사인 필터링 (실제 1km 내)
+        List<StudyPlace> nearbyPlaces = filterWithinRadius(candidates, lat, lng, radiusKm);
 
-        }
-        System.out.println("nearbyPlaces = " + nearbyPlaces);
+        // 4) 거리순 정렬 + 최대 후보 제한
         nearbyPlaces.sort(Comparator.comparingDouble(
                 p -> haversineDistance(lat, lng, p.getLat(), p.getLng())
         ));
+        nearbyPlaces = nearbyPlaces.stream()
+                .limit(maxCandidates)
+                .collect(Collectors.toList());
 
-        // 4) 최대 후보 제한
-        return nearbyPlaces.size() > maxCandidates
-                ? nearbyPlaces.subList(0, maxCandidates)
-                : nearbyPlaces;
+        // 5) DTO 변환
+        return convertToLocationResponseDtos(nearbyPlaces, lat, lng, maxCandidates);
     }
 
     // 위 경도 반올림
     @Transactional
-    public List<StudyPlace> getNearbyWithRounding(double lat, double lng) throws JsonProcessingException {
+    public List<LocationResponseDto> getNearbyWithRounding(double lat, double lng) throws JsonProcessingException {
         final int maxCandidates = 20;
         final int minCandidates = 5;
 
         // 1) 위도/경도 반올림 (예: 소수점 둘째 자리)
-        double latRange = 1.0 / 111.0;
-        double lngRange = 1.0 / (111.0 * Math.cos(Math.toRadians(lat)));
+        double radiusKm = 1.2; // 원하는 탐색 반경
+        double latRange = radiusKm / 111.0; // 위도: 1도 ≈ 111km
+        double lngRange = radiusKm / (111.0 * Math.cos(Math.toRadians(lat))); // 경도: 위도 보정
+
 
         LocalDateTime cutoff = LocalDateTime.now().minusWeeks(1);
         // 1) DB에서 최근 1주일 내 데이터만 가져오기 (위치 필터링은 제외)
@@ -82,6 +88,7 @@ public class StudyPlaceService {
                 lat, lng, latRange, lngRange, cutoff
         );
 
+        System.out.println("candidates.size() = " + candidates.size());
         // 3) 하버사인 필터링 (실제 1km 내)
         List<StudyPlace> nearbyPlaces = filterWithinRadius(candidates, lat, lng, 1.0);
 
@@ -103,63 +110,46 @@ public class StudyPlaceService {
         nearbyPlaces.sort(Comparator.comparingDouble(
                 p -> haversineDistance(lat, lng, p.getLat(), p.getLng())
         ));
-        return nearbyPlaces.size() > maxCandidates
-                ? nearbyPlaces.subList(0, maxCandidates)
-                : nearbyPlaces;
+        // DTO 변환
+        return convertToLocationResponseDtos(nearbyPlaces, lat, lng, maxCandidates);
     }
 
     // 지오 해시
     @Transactional
-    public List<StudyPlace> getNearbyOrFetch(double lng, double lat) throws JsonProcessingException {
+    public List<LocationResponseDto> getNearbyOrFetch(double lng, double lat) throws JsonProcessingException {
         final int maxCandidates = 20;
         final int minCandidates = 5;
-        final int minPerCell = 1;
 
-        LocalDateTime now = LocalDateTime.now();
-        int weeksToSkip = 1; // 1주일
-
+        // 1) 사용자 위치 지오해시 생성
         String userHash = GeoHash.withCharacterPrecision(lat, lng, GEOHASH_PRECISION).toBase32();
         List<String> surroundingHashes = getSurroundingGeohashes(userHash);
 
-        // 1) 후보 격자 필터링 (쿨다운 고려)
-        List<String> candidateHashes = surroundingHashes.stream()
-                .filter(hash -> shouldIncludeHash(hash, now, weeksToSkip))
-                .collect(Collectors.toList());
-
-
-        if (candidateHashes.isEmpty()) {
+        if (surroundingHashes.isEmpty()) {
             return Collections.emptyList();
         }
 
-        // 2) DB 조회 + 거리 필터링
-        List<StudyPlace> candidates = studyPlaceRepository.findByGeohashIn(candidateHashes);
+        // 2) DB 조회
+        List<StudyPlace> candidates = studyPlaceRepository.findByGeohashIn(surroundingHashes);
+        System.out.println("candidates.size() = " + candidates.size());
+
+        // 3) 실제 거리 필터링
         List<StudyPlace> nearbyPlaces = filterWithinRadius(candidates, lat, lng, 1.0);
 
-        // 3) 격자 단위 검사
-        boolean needApiCall = false;
-        for (String hash : candidateHashes) {
-            needApiCall |= checkCellAndUpdateEmptyRegion(hash, minPerCell, now);
-        }
-
-        // 4) 후보 부족 또는 API 호출 필요 시
-        if (nearbyPlaces.size() < minCandidates || needApiCall) {
+        // 4) 후보 부족 시 API 호출
+        if (nearbyPlaces.size() < minCandidates) {
             fetchAndUpdatePlaces(lat, lng);
 
             // API 호출 후 DB 재조회
-            candidates = studyPlaceRepository.findByGeohashIn(candidateHashes);
+            candidates = studyPlaceRepository.findByGeohashIn(surroundingHashes);
             nearbyPlaces = filterWithinRadius(candidates, lat, lng, 1.0);
-
-            // API 호출 후 빈 영역 갱신
-            updateEmptyRegions(candidateHashes, now);
         }
 
         // 5) 거리순 정렬 + 최대 후보 제한
         nearbyPlaces.sort(Comparator.comparingDouble(
                 p -> haversineDistance(lat, lng, p.getLat(), p.getLng())
         ));
-        return nearbyPlaces.size() > maxCandidates
-                ? nearbyPlaces.subList(0, maxCandidates)
-                : nearbyPlaces;
+
+        return convertToLocationResponseDtos(nearbyPlaces, lat, lng, maxCandidates);
     }
 
 
@@ -248,57 +238,6 @@ public class StudyPlaceService {
 
 
     /* ---------------- Helper Methods ---------------- */
-    // 후보 격자 포함 여부 판단 (쿨다운 고려)
-    private boolean shouldIncludeHash(String hash, LocalDateTime now, int weeksToSkip) {
-        return emptyRegionRepository.findByGeohash(hash)
-                .map(er -> er.getIsEmpty() && (er.getLastCheckedAt() == null ||
-                        er.getLastCheckedAt().isBefore(now.minusWeeks(weeksToSkip))))
-                .orElse(true); // 기록 없으면 포함
-    }
-    // 격자 단위 검사 + EMPTY_REGION 갱신/삭제
-
-    private boolean checkCellAndUpdateEmptyRegion(String hash, int minPerCell, LocalDateTime now) {
-        long count = studyPlaceRepository.countByGeohash(hash);
-
-        if (count == 0) {
-            // 데이터 없음 → 빈 영역 저장
-            saveOrUpdateEmptyRegion(hash, true, now);
-            return true; // API 호출 필요
-        }
-
-        if (count < minPerCell) {
-            // 데이터는 있으나 최소 기준 미달 → API 호출 필요
-            return true;
-        }
-
-        // 데이터 충분 → 기존 빈 영역 기록 삭제
-        emptyRegionRepository.findByGeohash(hash).ifPresent(emptyRegionRepository::delete);
-        return false; // API 호출 불필요
-    }
-
-    private void saveOrUpdateEmptyRegion(String hash, boolean isEmpty, LocalDateTime now) {
-        EmptyRegion region = emptyRegionRepository.findByGeohash(hash)
-                .orElseGet(() -> {
-                    EmptyRegion er = new EmptyRegion();
-                    er.setGeohash(hash);
-                    return er;
-                });
-        region.setIsEmpty(isEmpty);
-        region.setLastCheckedAt(now);
-        emptyRegionRepository.save(region);
-    }
-
-    private void updateEmptyRegions(List<String> hashes, LocalDateTime now) {
-        for (String hash : hashes) {
-            long count = studyPlaceRepository.countByGeohash(hash);
-            if (count == 0) {
-                saveOrUpdateEmptyRegion(hash, true, now);
-            } else {
-                // 데이터 충분 → 빈 영역 삭제
-                emptyRegionRepository.findByGeohash(hash).ifPresent(emptyRegionRepository::delete);
-            }
-        }
-    }
 
     private List<StudyPlace> filterWithinRadius(List<StudyPlace> candidates, double lat, double lng, double radiusKm) {
 
@@ -334,5 +273,21 @@ public class StudyPlaceService {
 
         }
         return adjacent.stream().map(GeoHash::toBase32).collect(Collectors.toList());
+    }
+
+    private List<LocationResponseDto> convertToLocationResponseDtos(List<StudyPlace> places, double lat, double lng, int limit) {
+        return places.stream()
+                .limit(limit)
+                .map(place -> {
+                    int distance = (int) Math.round(haversineDistance(lat, lng, place.getLat(), place.getLng()) * 1000); // m 단위
+                    return new LocationResponseDto(
+                            place.getPlaceName(),
+                            place.getAddress(),
+                            place.getRoadAddress(),
+                            place.getPhone(),
+                            distance + "m"
+                    );
+                })
+                .collect(Collectors.toList());
     }
 }
