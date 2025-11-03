@@ -11,10 +11,10 @@ permissions:
     group: ubuntu
 
 hooks:
-  AfterInstall:
+  BeforeInstall:
     - location: clean-up.sh
       timeout: 180
 
-  ApplicationStart:
+  AfterInstall:
     - location: start.sh
       timeout: 180
