@@ -1,6 +1,7 @@
 package com.switching.study_matching_site.repository;
 
 import com.switching.study_matching_site.domain.StudyPlace;
+import com.switching.study_matching_site.dto.studyplace.CellCountDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -39,6 +40,11 @@ public interface StudyPlaceRepository extends JpaRepository<StudyPlace, Long> {
             @Param("cutoff") LocalDateTime cutoff
     );
 
+    @Query("SELECT new com.switching.study_matching_site.dto.studyplace.CellCountDto(s.geohash, COUNT(s)) " +
+            "FROM StudyPlace s " +
+            "WHERE s.geohash IN :hashes " +
+            "GROUP BY s.geohash")
+    List<CellCountDto> countByGeohashIn(@Param("hashes") List<String> hashes);
 
     Optional<StudyPlace> findByPlaceNameAndAddress (String placeName, String address);
 

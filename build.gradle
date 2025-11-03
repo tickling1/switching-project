@@ -109,7 +109,7 @@ dependencies {
 
 	// rate limit
 	implementation 'com.google.guava:guava:32.1.2-jre'
-	implementation 'io.github.resilience4j:resilience4j-spring-boot3:2.0.2'
+	implementation("com.bucket4j:bucket4j-core:8.7.0")
 
 
 	// dummy data

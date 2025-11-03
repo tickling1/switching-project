@@ -3,8 +3,13 @@ package com.switching.study_matching_site.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
-import io.github.resilience4j.retry.annotation.Retry;
+import com.switching.study_matching_site.SecurityUtil;
+import com.switching.study_matching_site.UserRateLimiter;
+import com.switching.study_matching_site.domain.Member;
+import com.switching.study_matching_site.exception.ErrorCode;
+import com.switching.study_matching_site.exception.RateLimitException;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -25,15 +30,34 @@ import java.util.List;
 public class KakaoLocalService {
 
     private final RestTemplate restTemplate;
-    @Value("${kakao.api-key}")
-    private String kakaoApiKey;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final UserRateLimiter userRateLimiter;
+    private final ObjectMapper objectMapper;
+    private final SecurityUtil securityUtil;
 
-    public KakaoLocalService(RestTemplateBuilder builder) {
-        this.restTemplate = builder.build();
+
+    private final String kakaoApiKey;
+
+    public KakaoLocalService(RestTemplateBuilder restTemplateBuilder,
+                             @Value("${kakao.api-key}") String kakaoApiKey,
+                             SecurityUtil securityUtil) {
+        this.restTemplate = restTemplateBuilder.build();
+        this.userRateLimiter = new UserRateLimiter();
+        this.objectMapper = new ObjectMapper();
+        this.kakaoApiKey = kakaoApiKey;
+        this.securityUtil = securityUtil;
     }
-    @RateLimiter(name = "kakaoApi")
+
     public List<JsonNode> searchStudyRooms(String query, double lng, double lat) throws JsonProcessingException {
+
+        Member member = securityUtil.getMemberByUserDetails();
+        String userId = member.getId().toString();
+
+        boolean allowed = userRateLimiter.tryConsume(userId);
+        if (!allowed) {
+            log.warn("User {} exceeded rate limit", member.getLoginId());
+            throw new RateLimitException(ErrorCode.TOO_MANY_REQUESTS);
+        }
+
         List<JsonNode> results = new ArrayList<>();
         int size = 15;
         int maxPage = 3;
@@ -58,8 +82,6 @@ public class KakaoLocalService {
         return results;
     }
 
-    @RateLimiter(name = "kakaoApiBatch")
-    @Retry(name = "kakaoApiBatchRetry", fallbackMethod = "onSearchFallBack")
     public JsonNode searchByNameWithRateLimit(String placeName, String address, double lng, double lat) throws JsonProcessingException {
         int size = 15;
         int maxPage = 3;
@@ -91,10 +113,6 @@ public class KakaoLocalService {
         return null; // 일치하는 결과 없으면 null
     }
 
-    private JsonNode onSearchFallback(String placeName, String address, double lng, double lat, Throwable t) {
-        log.warn("Fallback triggered for place={}, address={}, reason={}", placeName, address, t.getMessage());
-        return null; // fallback: null 반환 → 비활성화 처리
-    }
 
     /*public String searchStudyRooms(double lng, double lat, String query) {
         String url = String.format(

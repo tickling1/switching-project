@@ -46,7 +46,6 @@ public class JWTFilter extends OncePerRequestFilter {
         if (requestURI.startsWith("/members/login") ||
                 requestURI.startsWith("/members/signup") ||
                 requestURI.startsWith("/geohash") ||
-                requestURI.startsWith("/study-places-example1") ||
                 requestURI.startsWith("/study-places-example2") ||
                 requestURI.startsWith("/study-places-fetch") ||
                 requestURI.startsWith("/dummy") ||
@@ -58,7 +57,6 @@ public class JWTFilter extends OncePerRequestFilter {
                 requestURI.startsWith("/v3/api-docs") ||
                 requestURI.startsWith("/swagger-resources") ||
                 requestURI.startsWith("/rooms/list") ||
-                requestURI.startsWith("/study-places") ||
                 requestURI.startsWith("/actuator/health")){
             filterChain.doFilter(request, response);
             return;

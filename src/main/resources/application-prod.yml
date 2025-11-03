@@ -29,28 +29,6 @@ logging.level:
   org.hibernate.SQL: debug
   # org.hibernate.type: trace
 
-resilience4j:
-  ratelimiter:
-    instances:
-      kakaoApiUser:        # 사용자 요청용
-        limit-for-period: 50        # 1초 동안 최대 50회 호출 허용
-        limit-refresh-period: 500ms # 제한 카운트 갱신 주기: 0.5초
-        timeout-duration: 200ms     # 초과 시 최대 0.2초 대기 후 실패
-      kakaoApiBatch:       # 배치 갱신용
-        limit-for-period: 30        # 1초 동안 최대 30회 호출 허용
-        limit-refresh-period: 1s    # 제한 카운트 갱신 주기: 1초
-        timeout-duration: 500ms     # 초과 시 최대 0.5초 대기 후 실패
-
-  retry:
-    instances:
-      kakaoApiBatchRetry:
-        max-attempts: 3            # 최대 3번 시도
-        wait-duration: 2s          # 각 시도 간 대기 시간
-        retry-exceptions:
-          - org.springframework.web.client.HttpServerErrorException
-          - org.springframework.web.client.ResourceAccessException
-          - java.net.SocketTimeoutException
-
 custom:
   secret:
     name: prod/switching
