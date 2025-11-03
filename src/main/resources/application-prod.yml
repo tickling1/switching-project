@@ -14,7 +14,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: none
     properties:
       javax.persistence.lock.timeout: 3000 # 밀리초 단위, 3초
       hibernate:
