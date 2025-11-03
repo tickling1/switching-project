@@ -1,8 +1,9 @@
 version: 0.0
 os: linux
 files:
-  - source: .
+  - source: /
     destination: /home/ubuntu/app/deploy
+    overwrite: yes
 
 permissions:
   - object: /home/ubuntu/app/deploy
@@ -10,10 +11,10 @@ permissions:
     group: ubuntu
 
 hooks:
-  BeforeInstall:
+  AfterInstall:
     - location: clean-up.sh
       timeout: 180
 
-  AfterInstall:
+  ApplicationStart:
     - location: start.sh
       timeout: 180
