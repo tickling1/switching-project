@@ -13,4 +13,5 @@ fi
 rm -f $DEPLOY_PATH/app.jar
 rm -f $DEPLOY_PATH/app.zip
 rm -f $DEPLOY_PATH/start.sh
+rm -f $DEPLOY_PATH/appspec.yml
 echo "✅ Clean-up complete!"
