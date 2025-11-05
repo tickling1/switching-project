@@ -26,6 +26,10 @@ logging.level:
   org.hibernate.SQL: debug
   # org.hibernate.type: trace
 
+custom:
+  secret:
+    name: prod/switching
+
 server:
   shutdown: graceful
 
