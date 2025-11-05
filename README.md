@@ -109,6 +109,12 @@ sudo swapon /swapfile
   https://madeprogame.tistory.com/406  
 
 - [#6] 무중단 배포 전략 (Blue-Green, Rolling, Canary)  
+  https://madeprogame.tistory.com/405
+
+- [#7] 지오해시 기반 위치 검색 최적화
+  https://madeprogame.tistory.com/407
+
+- [#8] API 호출량 제한
   https://madeprogame.tistory.com/405  
 ###
 ---
