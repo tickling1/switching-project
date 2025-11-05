@@ -33,12 +33,10 @@ public class KakaoLocalService {
     private final UserRateLimiter userRateLimiter;
     private final ObjectMapper objectMapper;
     private final SecurityUtil securityUtil;
-
-
     private final String kakaoApiKey;
 
     public KakaoLocalService(RestTemplateBuilder restTemplateBuilder,
-                             @Value("${kakao.api-key}") String kakaoApiKey,
+                             @Value("${kakao.api.key}") String kakaoApiKey,
                              SecurityUtil securityUtil) {
         this.restTemplate = restTemplateBuilder.build();
         this.userRateLimiter = new UserRateLimiter();

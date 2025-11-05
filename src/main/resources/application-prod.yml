@@ -22,18 +22,10 @@ spring:
         # show_sql: true
         format_sql: true
 
-kakao:
-  api-key: ${KAKAO_API_KEY}
-
 logging.level:
   org.hibernate.SQL: debug
   # org.hibernate.type: trace
 
-custom:
-  secret:
-    name: prod/switching
-
 server:
-  port: 9090
   shutdown: graceful
 
