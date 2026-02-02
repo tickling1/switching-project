@@ -120,6 +120,7 @@ sudo swapon /swapfile
 ###
 ---
 ## 📈 **DB ERD**
+<img width="855" height="803" alt="swtiching erd" src="https://github.com/user-attachments/assets/e66b35f6-6bc9-4fab-b88a-83c10b10e689" />
 
 &nbsp;
 &nbsp;
