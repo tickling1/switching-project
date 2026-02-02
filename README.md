@@ -1,4 +1,3 @@
-# [![Deploy Spring Boot to AWS](https://github.com/tickling1/switching-project/actions/workflows/gradle.yml/badge.svg?branch=main)](https://github.com/tickling1/switching-project/actions/workflows/gradle.yml)
 <img width="2236" height="1258" alt="image" src="https://github.com/user-attachments/assets/d0709a16-a01d-4c33-9005-de4ae7c192dc" />
 
 ### **Languages**
