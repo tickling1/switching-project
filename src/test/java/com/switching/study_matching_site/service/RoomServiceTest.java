@@ -47,7 +47,7 @@ class RoomServiceTest {
                 0,
                 6,
                 LocalTime.now(),
-                LocalTime.now().plusHours( ㅂ3),
+                LocalTime.now().plusHours(3),
                 Goal.STUDY,
                 TechSkill.JAVA,
                 3,
