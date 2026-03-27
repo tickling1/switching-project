@@ -22,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import net.datafaker.Faker;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -52,7 +53,7 @@ public class StudyPlaceController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/study-places")
-    public List<LocationResponseDto> getNearbyStudyPlaces(@RequestBody LocationRequestDto location) throws JsonProcessingException {
+    public List<LocationResponseDto> getNearbyStudyPlaces(@RequestBody @Validated LocationRequestDto location) throws JsonProcessingException {
         return studyPlaceService.getNearbyOrFetch(location.getLng(), location.getLat());
     }
 
@@ -215,7 +216,7 @@ public class StudyPlaceController {
             description = "[테스트용] DB의 모든 데이터를 전수 조사하여 반환합니다. 데이터가 많을 경우(예: 100만 건) 매우 느려질 수 있습니다."
     )
     @PostMapping("/study-places-example1")
-    public List<LocationResponseDto> getNearbyStudyPlaces1(@RequestBody LocationRequestDto location) throws JsonProcessingException {
+    public List<LocationResponseDto> getNearbyStudyPlaces1(@RequestBody @Validated LocationRequestDto location) throws JsonProcessingException {
         return studyPlaceService.searchNearbyRooms(location.getLat(), location.getLng());
     }
 
@@ -225,7 +226,7 @@ public class StudyPlaceController {
             description = "[테스트용] 위경도 값에 반올림을 적용하여 특정 범위 내의 데이터를 조회합니다. 인덱스 활용 여부에 따라 풀 스캔보다 빠를 수 있습니다."
     )
     @PostMapping("/study-places-example2")
-    public List<LocationResponseDto> getNearbyStudyPlaces2(@RequestBody LocationRequestDto location) throws JsonProcessingException {
+    public List<LocationResponseDto> getNearbyStudyPlaces2(@RequestBody @Validated LocationRequestDto location) throws JsonProcessingException {
         return studyPlaceService.getNearbyWithRounding(location.getLat(), location.getLng());
     }
 

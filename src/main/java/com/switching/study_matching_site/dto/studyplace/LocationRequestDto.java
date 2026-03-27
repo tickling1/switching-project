@@ -1,6 +1,7 @@
 package com.switching.study_matching_site.dto.studyplace;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,8 +11,10 @@ import lombok.Setter;
 public class LocationRequestDto {
 
     @Schema(description = "경도 (Longitude)", example = "126.9780")
+    @NotNull
     private double lng;
 
     @Schema(description = "위도 (Latitude)", example = "37.5665")
+    @NotNull
     private double lat;
 }

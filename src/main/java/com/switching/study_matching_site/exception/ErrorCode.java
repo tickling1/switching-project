@@ -8,6 +8,9 @@ import lombok.RequiredArgsConstructor;
 public enum ErrorCode {
     // Common
     INVALID_INPUT_VALUE(400, "C001", "잘못된 형식의 값을 입력했습니다."),
+    METHOD_NOT_ALLOWED(405, "C002", "허용되지 않는 메소드입니다."),
+    NOT_FOUND_PATH(404, "COMMON-001", "해당 경로를 찾을 수 없습니다."),
+    INTERNAL_SERVER_ERROR(500, "C004", "서버에 문제가 발생했습니다."),
 
     // Member
     MEMBER_NOT_FOUND(404, "M001", "회원을 찾지 못했습니다."),
@@ -64,7 +67,6 @@ public enum ErrorCode {
 
     // API 오류
     NOT_ENOUGH_DATA(400, "A001", "근거리 스터디룸 데이터를 확보할 수 없습니다."),
-    NOT_FOUND_PATH(404, "COMMON-001", "해당 경로를 찾을 수 없습니다."),
     // 토큰 부족
     TOO_MANY_REQUESTS(429, "R120", "요청 횟수가 제한을 초과했습니다.");
 

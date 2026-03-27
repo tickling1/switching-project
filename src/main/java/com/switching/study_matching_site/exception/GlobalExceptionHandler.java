@@ -5,6 +5,7 @@ import org.hibernate.dialect.lock.PessimisticEntityLockException;
 import org.hibernate.exception.LockTimeoutException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -55,5 +56,11 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<ErrorResponse> handlePessimisticEntityLockException() {
         ErrorResponse errorResponse = ErrorResponse.of(ErrorCode.PESSIMISTIC_LOCK_FAILED);
         return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT); // 409 Conflict
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleReadableException(HttpMessageNotReadableException e) {
+        ErrorResponse errorResponse = ErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE);
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 }
