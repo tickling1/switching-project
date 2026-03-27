@@ -26,11 +26,10 @@ public class ProfileCreateDto {
 
 
     @NotNull
-    @Schema(description = "오프라인 여부", example = "OFFLINE, ONLINEb")
+    @Schema(description = "오프라인 여부", example = "OFFLINE, ONLINE")
     private OfflineStatus isOffline; // true면 오프라인, false면 온라인
 
     @Schema(description = "스터디 사용 기술", example = "JAVA, PYTHON, KOTLIN, C, JAVASCRIPT")
-    @Pattern(regexp = "JAVA|PYTHON|KOTLIN|C|JAVASCRIPT", message = "언어는 JAVA, PYTHON, KOTLIN, C, JAVASCRIPT 중 하나여야 합니다.")
     private TechSkill techSkill; // JAVA, PYTHON, KOTLIN, C, JAVASCRIPT
 
     @NotNull

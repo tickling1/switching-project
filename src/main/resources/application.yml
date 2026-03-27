@@ -4,6 +4,15 @@ spring:
   lifecycle:
     timeout-per-shutdown-phase: 30s
 
+
+  jackson:
+    # 1. 대소문자 구분 안 함 (MapperFeature)
+    mapper:
+      accept-case-insensitive-enums: true
+    # 2. 알 수 없는 값은 null 처리 (DeserializationFeature)
+    deserialization:
+      read-unknown-enum-values-as-null: true
+
   profiles:
     active: dev
 
