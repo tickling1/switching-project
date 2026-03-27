@@ -55,8 +55,9 @@ public class ProfileController {
 
     @Parameter(name = "profileId", description = "프로필 ID", in = ParameterIn.PATH)
     @GetMapping("/profiles/{profileId}")
-    public String read(@PathVariable Long profileId) {
-        return profileService.readProfile(profileId).toString();
+    public ResponseEntity<ProfileReadDto> read(@PathVariable Long profileId) {
+        ProfileReadDto profileReadDto = profileService.readProfile(profileId);
+        return ResponseEntity.ok().body(profileReadDto);
     }
 
     @Operation(summary = "프로필 수정", description = "프로필을 수정합니다.")
