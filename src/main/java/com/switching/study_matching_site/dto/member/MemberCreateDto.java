@@ -3,6 +3,7 @@ package com.switching.study_matching_site.dto.member;
 import com.switching.study_matching_site.domain.type.EnterStatus;
 import com.switching.study_matching_site.domain.Member;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
@@ -71,13 +72,8 @@ public class MemberCreateDto {
     @DateTimeFormat(pattern = "yyyy-mm-dd")
     private LocalDate birthDate;
 
-    /**
-     * @Pattern
-     * 5자에서 20자 사이의 문자+특수문자 형식의 사용자명, 뒤에 도메인 형식
-     */
     @NotNull
-    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{5,20}@[A-Za-z]{2,}\\.[A-Za-z]{2,}$",
-            message = "올바른 이메일 형식이 아닙니다.")
+    @Email
     @Schema(description = "회원 이메일", example = "example@gmail.com")
     private String email;
 

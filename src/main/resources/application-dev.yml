@@ -11,7 +11,7 @@ spring:
     password: "rltmddn7!"
 
   jwt:
-    secret: "my-very-strong-secret-key-that-is-long-enough-1234567890"
+    secret: "vmfhaltmghshqhffpjtwhdaudwpdtnsmsepdtptks9df8sd7f8s7f8d7s8f7d8s7f8d7s8f7d8s7f"
 
   jpa:
     hibernate:

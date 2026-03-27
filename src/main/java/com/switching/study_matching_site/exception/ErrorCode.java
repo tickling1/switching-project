@@ -64,6 +64,7 @@ public enum ErrorCode {
 
     // API 오류
     NOT_ENOUGH_DATA(400, "A001", "근거리 스터디룸 데이터를 확보할 수 없습니다."),
+    NOT_FOUND_PATH(404, "COMMON-001", "해당 경로를 찾을 수 없습니다."),
     // 토큰 부족
     TOO_MANY_REQUESTS(429, "R120", "요청 횟수가 제한을 초과했습니다.");
 

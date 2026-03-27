@@ -49,7 +49,7 @@ public class MemberController {
             @ApiResponse(responseCode = "200", description = "회원 등록 성공"),
             @ApiResponse(responseCode = "400", description = "입력값 유효성 검사 실패 (아이디 중복 등)")
     })
-    @PostMapping("/members/signup")
+    @PostMapping("/members")
     public ResponseEntity<Void> signMember(@RequestBody @Validated MemberCreateDto memberCreateDto) {
         Long signMemberId = memberService.joinMember(memberCreateDto);
         return ResponseEntity.ok().build();

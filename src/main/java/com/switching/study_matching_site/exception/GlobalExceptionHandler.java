@@ -11,6 +11,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.util.Collections;
 import java.util.List;
@@ -21,7 +22,7 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
 
     /**
-     *  javax.validation.Valid or @Validated 으로 binding error 발생시 발생한다.
+     *  javax.validation.Valid or @Validated 으로 binding error 발생시 발생
      *  HttpMessageConverter 에서 등록한 HttpMessageConverter binding 못할경우 발생
      *  주로 @RequestBody, @RequestPart 어노테이션에서 발생
      */
@@ -34,6 +35,14 @@ public class GlobalExceptionHandler {
         // BindingResult에서 필드 오류 가져오기
         final ErrorResponse errorResponse = ErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE, bindingResult);
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    // 404 예외 처리
+    @ExceptionHandler(NoHandlerFoundException.class)
+    protected ResponseEntity<ErrorResponse> handleNoHandlerFoundException(NoHandlerFoundException e) {
+        log.error("NoHandlerFoundException: {}", e.getMessage());
+        ErrorResponse errorResponse = ErrorResponse.of(ErrorCode.NOT_FOUND_PATH);
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(BusinessException.class)

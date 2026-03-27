@@ -7,6 +7,7 @@ import com.switching.study_matching_site.service.CustomerUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -75,9 +76,10 @@ public class SecurityConfig {
         // '/'은 바로 swagger ui 화면을 넘어갈 때 필요
         http
                 .authorizeHttpRequests((auth) -> auth
+                        .requestMatchers(HttpMethod.POST, "/members").permitAll()
                         .requestMatchers(
-                                "/" ,"/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**",
-                                "/members/signup","/reissue", "/rooms/list", "/geohash","/members/login",
+                                "/" ,"/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**"
+                                ,"/reissue", "/rooms/list", "/geohash","/members/login",
                                 "/", "/actuator/health", "/study-places", "/study-places-example2",
                                 "/study-places-example1", "/study-places-fetch", "/dummy").permitAll()// 해당 경로에서는 모든 권한를 허용함
                         .anyRequest().authenticated()); // 나머지 요청에서는 로그인한 사람만 들어갈 수 있음.

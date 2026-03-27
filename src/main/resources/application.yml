@@ -1,15 +1,11 @@
 spring:
   application:
     name: study-matching-site
-
   lifecycle:
     timeout-per-shutdown-phase: 30s
 
   profiles:
     active: dev
-
-  jwt:
-    secret: ${spring.jwt.secret}
 
 server:
   port: 8080  # 기본 포트 (환경별로 덮어쓰기 가능)

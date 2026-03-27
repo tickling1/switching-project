@@ -9,7 +9,7 @@ spring:
     password:
 
   jwt:
-    secret: "sadsadwqdsadsads"
+    secret: "vmfhaltmghshqhffpjtwhdaudwpdtnsmsepdtptks9df8sd7f8s7f8d7s8f7d8s7f8d7s8f7d8s7f"
 
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
