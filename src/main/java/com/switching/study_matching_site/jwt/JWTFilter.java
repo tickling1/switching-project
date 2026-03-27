@@ -42,25 +42,25 @@ public class JWTFilter extends OncePerRequestFilter {
         log.info("[JWT 필터] URI: " + request.getRequestURI());
 
 
-        // 로그인, 회원가입, 토큰 재발급 경로는 JWT 필터를 거치지 않도록 설정
-        if (requestURI.startsWith("/members/login") ||
-                requestURI.startsWith("/members/signup") ||
-                requestURI.startsWith("/geohash") ||
-                requestURI.startsWith("/study-places-example2") ||
-                requestURI.startsWith("/study-places-fetch") ||
-                requestURI.startsWith("/dummy") ||
-                requestURI.startsWith("/members/reissue") ||
-                requestURI.startsWith("/members/logout") ||
-                requestURI.startsWith("/reissue") ||
-                requestURI.equals("/") ||
-                requestURI.startsWith("/swagger-ui") ||
-                requestURI.startsWith("/v3/api-docs") ||
-                requestURI.startsWith("/swagger-resources") ||
-                requestURI.startsWith("/rooms/list") ||
-                requestURI.startsWith("/actuator/health")){
-            filterChain.doFilter(request, response);
-            return;
-        }
+//        // 로그인, 회원가입, 토큰 재발급 경로는 JWT 필터를 거치지 않도록 설정
+//        if (requestURI.startsWith("/members/login") ||
+//                requestURI.startsWith("/members/signup") ||
+//                requestURI.startsWith("/geohash") ||
+//                requestURI.startsWith("/study-places-example2") ||
+//                requestURI.startsWith("/study-places-fetch") ||
+//                requestURI.startsWith("/dummy") ||
+//                requestURI.startsWith("/members/reissue") ||
+//                requestURI.startsWith("/members/logout") ||
+//                requestURI.startsWith("/reissue") ||
+//                requestURI.equals("/") ||
+//                requestURI.startsWith("/swagger-ui") ||
+//                requestURI.startsWith("/v3/api-docs") ||
+//                requestURI.startsWith("/swagger-resources") ||
+//                requestURI.startsWith("/rooms/list") ||
+//                requestURI.startsWith("/actuator/health")){
+//            filterChain.doFilter(request, response);
+//            return;
+//        }
 
         // 헤더에서 access키에 담긴 토큰을 꺼냄
         //String accessToken = request.getHeader("access");
@@ -73,38 +73,38 @@ public class JWTFilter extends OncePerRequestFilter {
         }
 
             // 토큰이 없다면 401 상태코드와 JSON 본문 응답
-            if (accessToken == null) {
-                sendErrorResponse(response, ErrorCode.JWT_TOKEN_MISSING);
-                return;
-            }
+        if (accessToken == null) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-            // 토큰 만료 여부 확인, 만료시 다음 필터로 넘기지 않음
-            try {
-                jwtUtil.isExpired(accessToken);
-            } catch (ExpiredJwtException e) {
-                sendErrorResponse(response, ErrorCode.JWT_TOKEN_EXPIRED);
-                return;
-            }
+        // 토큰 만료 여부 확인, 만료시 다음 필터로 넘기지 않음
+        try {
+            jwtUtil.isExpired(accessToken);
+        } catch (ExpiredJwtException e) {
+            sendErrorResponse(response, ErrorCode.JWT_TOKEN_EXPIRED);
+            return;
+        }
 
             // 토큰이 access인지 확인 (발급시 페이로드에 명시)
-            String category = jwtUtil.getCategory(accessToken);
+        String category = jwtUtil.getCategory(accessToken);
 
-            if (!category.equals("access")) {
-                sendErrorResponse(response, ErrorCode.JWT_TOKEN_MALFORMED);
-                return;
-            }
+        if (!category.equals("access")) {
+            sendErrorResponse(response, ErrorCode.JWT_TOKEN_MALFORMED);
+            return;
+        }
 
-            // loginId 값을 획득
-            String loginId = jwtUtil.getLoginId(accessToken);
-            UserDetails userDetails = customerUserDetailsService.loadUserByUsername(loginId);
+        // loginId 값을 획득
+        String loginId = jwtUtil.getLoginId(accessToken);
+        UserDetails userDetails = customerUserDetailsService.loadUserByUsername(loginId);
 
             // 넣는다
-            Authentication authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(authToken);
+        Authentication authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authToken);
 
             // 다음 필터로 넘김
-            filterChain.doFilter(request, response);
-        }
+        filterChain.doFilter(request, response);
+    }
 
         private void sendErrorResponse(HttpServletResponse response, ErrorCode errorCode) throws IOException {
             response.setContentType("application/json;charset=UTF-8");

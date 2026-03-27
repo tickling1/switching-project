@@ -35,7 +35,7 @@ public class ProfileController {
                             )
                     )
             })
-    @PostMapping("/profile")
+    @PostMapping("/profiles")
     public ResponseEntity<Void> postProfile(@RequestBody @Validated ProfileCreateDto profileCreateDto) {
         profileService.writeProfile(profileCreateDto);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -54,7 +54,7 @@ public class ProfileController {
             })
 
     @Parameter(name = "profileId", description = "프로필 ID", in = ParameterIn.PATH)
-    @GetMapping("/profile/{profileId}")
+    @GetMapping("/profiles/{profileId}")
     public String read(@PathVariable Long profileId) {
         return profileService.readProfile(profileId).toString();
     }

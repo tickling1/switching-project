@@ -50,7 +50,7 @@ public enum ErrorCode {
     NOTICE_FORBIDDEN(403, "N002", "방장 권한이 필요합니다."),
 
     // JWT
-    JWT_TOKEN_MISSING(401, "J001", "JWT 토큰이 필요합니다."),
+    JWT_TOKEN_MISSING(401, "J001", "로그인이 필요한 기능입니다."),
     JWT_TOKEN_MALFORMED(400, "J002","이미 삭제되거나 잘못된 형식의 토큰입니다."),
     JWT_TOKEN_EXPIRED(401, "J003","JWT 토큰이 만료되었습니다."),
     JWT_TOKEN_INVALID(403, "J004","JWT 토큰이 유효하지 않습니다."),

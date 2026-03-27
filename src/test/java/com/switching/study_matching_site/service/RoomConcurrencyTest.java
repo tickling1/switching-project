@@ -38,6 +38,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -56,7 +57,7 @@ public class RoomConcurrencyTest {
     @Autowired
     private MemberRepository memberRepository;
 
-    private static final int THREAD_COUNT = 10;
+    private static final int THREAD_COUNT = 100;
 
     private Room testRoom;
 
@@ -75,6 +76,70 @@ public class RoomConcurrencyTest {
                 Region.SEOUL,
                 OfflineStatus.OFFLINE
         ));
+    }
+
+    @Test
+    @Rollback(value = false)
+    void 동시에_여러명이_입장하면_최대인원만큼만_입장된다_Latch() throws InterruptedException {
+        ExecutorService es = Executors.newFixedThreadPool(THREAD_COUNT);
+
+        // 1. 모든 스레드가 준비될 때까지 기다렸다가 "동시 출발" 시키기 위한 래치
+        CountDownLatch startLatch = new CountDownLatch(1);
+
+        // 2. 100개의 스레드가 모두 종료될 때까지 메인 스레드가 기다리기 위한 래치
+        CountDownLatch doneLatch = new CountDownLatch(THREAD_COUNT);
+
+        AtomicInteger successCount = new AtomicInteger(0);
+        AtomicInteger failCount = new AtomicInteger(0);
+
+        for (int i = 1; i <= THREAD_COUNT; i++) {
+            final int memberId = i;
+            es.execute(() -> {
+                try {
+                    // 각 스레드마다 독립적인 Member 생성 및 저장
+                    Member member = memberRepository.save(new Member(
+                            "loginId" + memberId, "password", "test" + memberId,
+                            LocalDate.now(), "test" + memberId + "@email.com",
+                            "010-0000-" + String.format("%04d", memberId), EnterStatus.OUT
+                    ));
+
+                    setAuthentication(member); // 스레드별 인증 정보 설정
+
+                    // -------------------------------------------------------
+                    startLatch.await(); //  여기서 100개가 다 찰 때까지 대기!
+                    // -------------------------------------------------------
+
+                    roomService.participateRoom(testRoom.getId());
+                    successCount.incrementAndGet();
+                    System.out.println(memberId + "번 참여 성공");
+                } catch (InvalidValueException e) {
+                    failCount.incrementAndGet();
+                    System.out.println(memberId + "번 참여 실패: " + e.getMessage());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    doneLatch.countDown(); // 작업 완료 신호
+                }
+            });
+        }
+
+        long startTime = System.currentTimeMillis();
+        startLatch.countDown(); // 100개 스레드가 동시에 run 시작
+
+        doneLatch.await(); // 100개 작업이 모두 끝날 때까지 대기
+        long endTime = System.currentTimeMillis();
+
+        es.shutdown();
+
+        // 검증
+        Room result = roomRepository.findById(testRoom.getId()).orElseThrow();
+        System.out.println("걸린 시간: " + (endTime - startTime) + "ms");
+        System.out.println("성공 수: " + successCount.get());
+        System.out.println("실패 수: " + failCount.get());
+        System.out.println("최종 DB 인원 수 = " + result.getCurrentCount());
+
+        assertThat(result.getCurrentCount()).isEqualTo(5);
+        assertThat(successCount.get()).isEqualTo(5); // 비관적 락이 잘 작동한다면 성공 건수도 5여야 함
     }
 
     @Test

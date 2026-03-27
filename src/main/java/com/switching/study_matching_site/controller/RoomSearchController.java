@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -60,11 +61,24 @@ public class RoomSearchController {
         return roomSearchService.findRoomById(roomId).toString();
     }
 
+    @Operation(
+            summary = "조건부 방 검색",
+            description = "검색 조건(지역, 인원, 태그 등)을 받아 필터링된 방 목록을 페이징하여 반환합니다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "검색 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 검색 조건"),
+            @ApiResponse(responseCode = "401", description = "인증 필요")
+    })
     @GetMapping("/rooms/search")
     public Page<RoomInfoResponseDto> searchRoomList(@RequestBody RoomSearchCond roomSearchCond) {
         return roomSearchService.roomSearchCondList(roomSearchCond);
     }
 
+    @Operation(
+            summary = "맞춤 매칭 방 목록 조회",
+            description = "현재 로그인한 사용자의 프로필을 기반으로 최적의 스터디 방을 추천합니다."
+    )
     @GetMapping("/rooms/matching")
     public Page<RoomInfoResponseDto> searchRoomList() {
         return matchingService.matchingRoomsList();

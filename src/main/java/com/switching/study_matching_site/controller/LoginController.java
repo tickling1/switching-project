@@ -54,7 +54,6 @@ public class LoginController {
     @PostMapping("/members/login")
     public ResponseEntity<TokenResponse> loginMember(@RequestBody @Validated LoginRequestDto loginRequestDto) {
         ResponseEntity<TokenResponse> responses = loginService.tryLogin(loginRequestDto);
-        // ResponseEntity<Void> responses = loginService.tryLogin(loginRequestDto, response);
         return responses;
     }
 }

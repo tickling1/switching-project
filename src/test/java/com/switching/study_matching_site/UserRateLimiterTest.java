@@ -31,5 +31,4 @@ class UserRateLimiterTest {
 
         assertTrue(userRateLimiter.tryConsume(userId), "1초 후 토큰이 리필되어 성공");
     }
-
 }

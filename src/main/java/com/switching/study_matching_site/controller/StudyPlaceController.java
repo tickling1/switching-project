@@ -8,9 +8,15 @@ import com.google.common.util.concurrent.RateLimiter;
 import com.switching.study_matching_site.domain.StudyPlace;
 import com.switching.study_matching_site.dto.studyplace.LocationRequestDto;
 import com.switching.study_matching_site.dto.studyplace.LocationResponseDto;
+import com.switching.study_matching_site.exception.ErrorResponse;
 import com.switching.study_matching_site.repository.StudyPlaceRepository;
 import com.switching.study_matching_site.service.KakaoLocalService;
 import com.switching.study_matching_site.service.StudyPlaceService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import net.datafaker.Faker;
@@ -39,11 +45,18 @@ public class StudyPlaceController {
     private static final int BATCH_SIZE = 50;
     private static final int SLEEP_MS = 300; // QPS 제한
 
+    @Operation(summary = "주변 스터디 카페 조회", description = "위도와 경도를 받아 주변의 스터디 카페를 조회합니다. DB에 없으면 카카오 API에서 가져옵니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "401", description = "인증 실패 (JWT 토큰 누락/만료)",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @PostMapping("/study-places")
     public List<LocationResponseDto> getNearbyStudyPlaces(@RequestBody LocationRequestDto location) throws JsonProcessingException {
         return studyPlaceService.getNearbyOrFetch(location.getLng(), location.getLat());
     }
 
+    @Operation(summary = "전국 데이터 강제 수집", description = "전국 주요 지역의 스터디 카페 데이터를 병렬로 수집합니다.")
     @PostMapping("/study-places-fetch")
     public ResponseEntity<String> fetchByRegionParallel() throws InterruptedException {
         LocalDateTime now = LocalDateTime.now();
@@ -143,7 +156,6 @@ public class StudyPlaceController {
         return ResponseEntity.ok("Parallel nationwide study places fetch started");
     }
 
-
     @Transactional
     public void fetchAndSaveBatchTransactional(double lat, double lng, LocalDateTime now) throws JsonProcessingException, InterruptedException {
         List<StudyPlace> batch = new ArrayList<>();
@@ -198,54 +210,36 @@ public class StudyPlaceController {
     }
 
     // 테이블 풀 스캔
+    @Operation(
+            summary = "주변 스터디 카페 조회 (성능 테스트 - 테이블 풀 스캔)",
+            description = "[테스트용] DB의 모든 데이터를 전수 조사하여 반환합니다. 데이터가 많을 경우(예: 100만 건) 매우 느려질 수 있습니다."
+    )
     @PostMapping("/study-places-example1")
     public List<LocationResponseDto> getNearbyStudyPlaces1(@RequestBody LocationRequestDto location) throws JsonProcessingException {
         return studyPlaceService.searchNearbyRooms(location.getLat(), location.getLng());
     }
 
     // 위 경도
+    @Operation(
+            summary = "주변 스터디 카페 조회 (성능 테스트 - 위경도 범위 검색)",
+            description = "[테스트용] 위경도 값에 반올림을 적용하여 특정 범위 내의 데이터를 조회합니다. 인덱스 활용 여부에 따라 풀 스캔보다 빠를 수 있습니다."
+    )
     @PostMapping("/study-places-example2")
     public List<LocationResponseDto> getNearbyStudyPlaces2(@RequestBody LocationRequestDto location) throws JsonProcessingException {
         return studyPlaceService.getNearbyWithRounding(location.getLat(), location.getLng());
     }
 
 
-
-    @PostMapping("/geohash")
-    public ResponseEntity<Map<String, Object>> testGeohash(@RequestBody Map<String, List<String>> request) throws JsonProcessingException {
-        List<String> geohashStrings = request.get("geohashes");
-        if (geohashStrings == null || geohashStrings.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "geohashes 필드가 필요합니다."));
-        }
-
-        Map<String, Object> result = new HashMap<>();
-        Map<String, List<String>> gridPlaces = new LinkedHashMap<>();
-        Map<String, Integer> gridCounts = new LinkedHashMap<>();
-
-        for (String gh : geohashStrings) {
-            GeoHash hash = GeoHash.fromGeohashString(gh);
-            WGS84Point point = hash.getBoundingBoxCenter();
-            double lat = point.getLatitude();
-            double lng = point.getLongitude();
-
-            List<JsonNode> nodes = kakaoLocalService.searchStudyRooms("스터디룸", lng, lat);
-
-            // 이름 중복 제거
-            List<String> placeNames = nodes.stream()
-                    .map(n -> n.get("place_name").asText())
-                    .distinct()
-                    .toList();
-
-            gridPlaces.put(gh, placeNames);
-            gridCounts.put(gh, placeNames.size());
-        }
-
-        result.put("counts", gridCounts);
-        result.put("places", gridPlaces);
-        return ResponseEntity.ok(result);
-    }
-
-    @PostMapping("/dummy")
+    @Operation(
+            summary = "대규모 더미 데이터 생성 (100만 건)",
+            description = "전국 범위(위도 33~43, 경도 124~132) 내에 랜덤한 위치의 스터디 카페 데이터를 100만 개 생성합니다. " +
+                    "Batch Size 1000 단위로 저장하며, 완료까지 상당한 시간이 소요됩니다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "데이터 생성 성공"),
+            @ApiResponse(responseCode = "500", description = "서버 타임아웃 또는 DB 용량 초과")
+    })
+    @PostMapping("/study-places/dummy")
     @Transactional
     public String generateDummyData() {
         int nationwideCount = 1000000; // 전국 데이터 수

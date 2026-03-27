@@ -21,7 +21,6 @@ import org.springframework.security.web.authentication.logout.LogoutFilter;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    //AuthenticationManager가 인자로 받을 AuthenticationConfiguraion 객체 생성자 주입
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JWTUtil jwtUtil;
     private RefreshRepository refreshRepository;
@@ -78,8 +77,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers(
                                 "/" ,"/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**",
-                                "/login","/reissue", "/rooms/**", "/rooms/list", "/geohash",
-                                "/", "/members/**", "/actuator/health", "/study-places", "/study-places-example2",
+                                "/members/signup","/reissue", "/rooms/list", "/geohash","/members/login",
+                                "/", "/actuator/health", "/study-places", "/study-places-example2",
                                 "/study-places-example1", "/study-places-fetch", "/dummy").permitAll()// 해당 경로에서는 모든 권한를 허용함
                         .anyRequest().authenticated()); // 나머지 요청에서는 로그인한 사람만 들어갈 수 있음.
 

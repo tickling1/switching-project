@@ -29,6 +29,10 @@ logging.level:
   # org.hibernate.type: trace
   org.hibernate.type.descriptor.sql: off  # 이걸 끄면 파라미터 바인딩 로그가 안 나옴
 
+kakao:
+  api:
+    key: test_api_key_value
+
 
 springdoc:
   swagger-ui:
