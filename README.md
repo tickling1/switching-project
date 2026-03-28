@@ -27,7 +27,7 @@
 단순 모집을 넘어 목적과 숙련도가 일치하는 최적의 학습 파트너를 찾아주는 스터디 매칭 플랫폼 서비스입니다. 기존 스터디 플랫폼은 방 제목 하나에 의존해 모이다 보니, 실력 차이나 목적 불일치로 인해 중도 포기하는 경우가 많았습니다.
 Switching은 이를 해결하기 위해 입문자와 숙련자의 니즈를 구분하고 학습 목적을 데이터화했습니다. 맞지 않는 옷을 입어서 생기는 중도 하차를 막고, 타겟팅된 매칭을 통해 스터디의 지속 가능성을 확보하고자 해 만든 RESTful API 기반의 백엔드 서버 프로젝트입니다.
 
-##### 📚 기술 스택
+##### 기술 스택
 - Backend: Java 17, Spring Boot, Spring Security, Spring Data JPA, QueryDSL
 - Database: MySQL
 - Security & Auth: JWT, AWS Secrets Manager
