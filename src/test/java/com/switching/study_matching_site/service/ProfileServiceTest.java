@@ -123,8 +123,9 @@ class ProfileServiceTest {
                 member);
         member.setProfile(profile);
 
+        when(profileRepository.findProfileWithUsernameByProfileId(any()))
+                .thenReturn(Optional.of(profile));
         // when
-        when(profileRepository.findById(any())).thenReturn(Optional.of(profile));
         ProfileReadDto dto = profileService.readProfile(1L);
 
         // then
@@ -164,7 +165,8 @@ class ProfileServiceTest {
 
         // 다른 사용자(member2)가 member 를 조회했을 때
         when(securityUtil.getMemberByUserDetails()).thenReturn(member2);
-        when(profileRepository.findById(1L)).thenReturn(Optional.of(profile));
+        when(profileRepository.findProfileWithUsernameByProfileId(1L))
+                .thenReturn(Optional.of(profile));
 
         // then
         InvalidValueException ex = assertThrows(InvalidValueException.class, () -> profileService.readProfile(1L));
@@ -197,7 +199,8 @@ class ProfileServiceTest {
         // "Mock 객체가 save를 호출하면 이 profile을 그대로 리턴해라"는 뜻이기 때문에 테스트 시 직접 연관관계 주입이 필요
         member.addProfile(profile);
 
-        when(profileRepository.findById(1L)).thenReturn(Optional.of(profile));
+        when(profileRepository.findProfileWithUsernameByProfileId(1L))
+                .thenReturn(Optional.of(profile));
 
         // when
         ProfileReadDto readDto = profileService.readProfile(1L);
