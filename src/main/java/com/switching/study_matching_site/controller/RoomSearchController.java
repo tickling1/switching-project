@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
@@ -67,11 +68,9 @@ public class RoomSearchController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "검색 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 검색 조건"),
-            @ApiResponse(responseCode = "401", description = "인증 필요")
     })
     @GetMapping("/rooms/search")
-    public Page<RoomInfoResponseDto> searchRoomList(@RequestBody RoomSearchCond roomSearchCond) {
+    public Page<RoomInfoResponseDto> searchRoomList(@RequestBody @ParameterObject RoomSearchCond roomSearchCond) {
         return roomSearchService.roomSearchCondList(roomSearchCond);
     }
 

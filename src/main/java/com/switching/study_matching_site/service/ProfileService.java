@@ -76,13 +76,16 @@ public class ProfileService {
     @Transactional(readOnly = true)
     public ProfileReadDto readProfile(Long profileId) {
         Member member = securityUtil.getMemberByUserDetails();
-        Profile findProfile = profileRepository.findById(profileId).orElseThrow(
+        // Profile findProfile = profileRepository.findById(profileId).orElseThrow(() -> new EntityNotFoundException(ErrorCode.PROFILE_NOT_FOUND));
+
+        //fetch join으로 member의 정보까지 조인해 한번에 가져와 DTO에 담음 (쿼리 -1회)
+        Profile findProfile = profileRepository.findProfileWithUsernameByProfileId(profileId).orElseThrow(
                 () -> new EntityNotFoundException(ErrorCode.PROFILE_NOT_FOUND));
 
-        // 사용자의 프로필이 비공개 처리인지 아닌지 확인
+
+        // 찾으려는 프로필이 비공개 처리인지 아닌지 확인
+        // 비공개 처리일 경우 자신이 자신의 프로필을 보는 것인지 상대방이 보는 것인지 확인
         if (findProfile.getIsPrivate() == Boolean.TRUE) {
-            // 비공개 처리일 경우 자신이 자신의 프로필을 보는 것인지 상대방이 보는 것인지 확인
-            // null-safe
             if (member.getProfile() == null || !Objects.equals(member.getProfile().getId(), findProfile.getId())) {
                 throw new InvalidValueException(ErrorCode.PROFILE_IS_PRIVATE);
             }

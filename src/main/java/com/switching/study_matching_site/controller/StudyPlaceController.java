@@ -1,7 +1,6 @@
 package com.switching.study_matching_site.controller;
 
 import ch.hsr.geohash.GeoHash;
-import ch.hsr.geohash.WGS84Point;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.util.concurrent.RateLimiter;

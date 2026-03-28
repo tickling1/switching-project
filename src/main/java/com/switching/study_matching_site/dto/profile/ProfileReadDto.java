@@ -18,6 +18,7 @@ import java.time.LocalTime;
 @NoArgsConstructor
 public class ProfileReadDto {
 
+    private String username;
 
     private OfflineStatus isOffline; // true면 오프라인, false면 온라인
 
@@ -51,6 +52,7 @@ public class ProfileReadDto {
     public static ProfileReadDto fromProfile(Profile profile) {
 
         return new ProfileReadDto(
+                profile.getMember().getUsername(),
                 profile.getOfflineStatus(),
                 profile.getTechSkill(),
                 profile.getDesiredLevel(),
@@ -60,19 +62,5 @@ public class ProfileReadDto {
                 profile.getRegion(),
                 profile.getIsPrivate()
         );
-    }
-
-    @Override
-    public String toString() {
-        return "ProfileReadDto{" +
-                "isOffline=" + isOffline +
-                ", techSkill=" + techSkill +
-                ", desiredLevel=" + desiredLevel +
-                ", studyGoal=" + studyGoal +
-                ", startTime=" + startTime +
-                ", endTime=" + endTime +
-                ", region=" + region +
-                ", isPrivate=" + isPrivate +
-                '}';
     }
 }

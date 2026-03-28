@@ -44,7 +44,7 @@ public enum ErrorCode {
     CHAT_NOT_FOUND(404, "T001", "아직 채팅이 없습니다."),
 
     // Profile
-    PROFILE_NOT_FOUND(404, "F001", "프로필을 찾지 못했습니다. 먼저 프로필을 작성해주세요."),
+    PROFILE_NOT_FOUND(404, "F001", "찾으시려는 프로필이 존재하지 않습니다."),
     PROFILE_ALREADY_EXISTS(409, "F002", "프로필이 이미 존재합니다."),
     PROFILE_IS_PRIVATE(403, "FOO3", "해당 프로필이 사용자에 의해 비공개 처리되었습니다."),
 

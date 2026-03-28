@@ -54,7 +54,7 @@ public class ProfileController {
             })
 
     @Parameter(name = "profileId", description = "프로필 ID", in = ParameterIn.PATH)
-    @GetMapping("/profiles")
+    @GetMapping("/profiles/{profileId}")
     public ResponseEntity<ProfileReadDto> read(@PathVariable Long profileId) {
         ProfileReadDto profileReadDto = profileService.readProfile(profileId);
         return ResponseEntity.ok().body(profileReadDto);
